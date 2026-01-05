@@ -142,7 +142,7 @@ O Baileys é o provedor padrão recomendado para uso gratuito. Conecte facilment
 1. **Criar a instância com QR code (Baileys é o padrão):**
 
 ```bash
-curl -X POST http://localhost:8080/instance/create \
+curl -X POST https://flowcloser-agent-production.up.railway.app/instance/create \
   -H "Content-Type: application/json" \
   -H "apikey: sua-chave-secreta-aqui" \
   -d '{
@@ -163,7 +163,7 @@ curl -X POST http://localhost:8080/instance/create \
 2. **Verificar status da conexão:**
 
 ```bash
-curl http://localhost:8080/instance/fetchInstances \
+curl https://flowcloser-agent-production.up.railway.app/instance/fetchInstances \
   -H "apikey: sua-chave-secreta-aqui"
 ```
 
@@ -433,7 +433,7 @@ A chave API está configurada no `.env` como `AUTHENTICATION_API_KEY`.
 INSTANCE_NAME="minha-instancia"
 API_KEY="sua-chave-secreta-aqui"
 
-curl -X POST http://localhost:8080/instance/create \
+curl -X POST https://flowcloser-agent-production.up.railway.app/instance/create \
   -H "Content-Type: application/json" \
   -H "apikey: $API_KEY" \
   -d "{
@@ -445,11 +445,11 @@ curl -X POST http://localhost:8080/instance/create \
 # 2. Escanear QR code no celular
 
 # 3. Verificar conexão
-curl http://localhost:8080/instance/fetchInstance/$INSTANCE_NAME \
+curl https://flowcloser-agent-production.up.railway.app/instance/fetchInstance/$INSTANCE_NAME \
   -H "apikey: $API_KEY"
 
 # 4. Enviar mensagem
-curl -X POST http://localhost:8080/message/sendText/$INSTANCE_NAME \
+curl -X POST https://flowcloser-agent-production.up.railway.app/message/sendText/$INSTANCE_NAME \
   -H "Content-Type: application/json" \
   -H "apikey: $API_KEY" \
   -d '{
