@@ -10,41 +10,6 @@ export class EventDto {
     byEvents?: boolean;
     base64?: boolean;
   };
-
-  websocket?: {
-    enabled?: boolean;
-    events?: string[];
-  };
-
-  sqs?: {
-    enabled?: boolean;
-    events?: string[];
-  };
-
-  rabbitmq?: {
-    enabled?: boolean;
-    events?: string[];
-  };
-
-  nats?: {
-    enabled?: boolean;
-    events?: string[];
-  };
-
-  pusher?: {
-    enabled?: boolean;
-    appId?: string;
-    key?: string;
-    secret?: string;
-    cluster?: string;
-    useTLS?: boolean;
-    events?: string[];
-  };
-
-  kafka?: {
-    enabled?: boolean;
-    events?: string[];
-  };
 }
 
 export function EventInstanceMixin<TBase extends Constructor>(Base: TBase) {
@@ -56,41 +21,6 @@ export function EventInstanceMixin<TBase extends Constructor>(Base: TBase) {
       url?: string;
       byEvents?: boolean;
       base64?: boolean;
-    };
-
-    websocket?: {
-      enabled?: boolean;
-      events?: string[];
-    };
-
-    sqs?: {
-      enabled?: boolean;
-      events?: string[];
-    };
-
-    rabbitmq?: {
-      enabled?: boolean;
-      events?: string[];
-    };
-
-    nats?: {
-      enabled?: boolean;
-      events?: string[];
-    };
-
-    pusher?: {
-      enabled?: boolean;
-      appId?: string;
-      key?: string;
-      secret?: string;
-      cluster?: string;
-      useTLS?: boolean;
-      events?: string[];
-    };
-
-    kafka?: {
-      enabled?: boolean;
-      events?: string[];
     };
   };
 }

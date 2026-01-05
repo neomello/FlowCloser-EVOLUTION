@@ -1,16 +1,6 @@
-import { configService, S3 } from '@config/env.config';
-
 const getTypeMessage = (msg: any) => {
-  let mediaId: string;
-
-  if (
-    configService.get<S3>('S3').ENABLE &&
-    (configService.get<S3>('S3').SAVE_VIDEO ||
-      (msg?.message?.videoMessage === undefined &&
-        msg?.message?.viewOnceMessageV2?.message?.videoMessage === undefined))
-  )
-    mediaId = msg.message?.mediaUrl;
-  else mediaId = msg.key?.id;
+  // S3 storage integration removed - using key.id for mediaId
+  const mediaId = msg.key?.id;
 
   const types = {
     conversation: msg?.message?.conversation,

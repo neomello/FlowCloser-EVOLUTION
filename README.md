@@ -52,26 +52,11 @@ Evolution API supports various integrations to enhance its functionality. Below 
 - [Chatwoot](https://www.chatwoot.com/):
   - Direct integration with Chatwoot for handling customer service for your business.
 
-- [RabbitMQ](https://www.rabbitmq.com/):
-  - Receive events from the Evolution API via RabbitMQ.
-
-- [Apache Kafka](https://kafka.apache.org/):
-  - Receive events from the Evolution API via Apache Kafka for real-time event streaming and processing.
-
-- [Amazon SQS](https://aws.amazon.com/pt/sqs/):
-  - Receive events from the Evolution API via Amazon SQS.
-
-- [Socket.io](https://socket.io/):
-  - Receive events from the Evolution API via WebSocket.
-
 - [Dify](https://dify.ai/):
   - Integrate your Evolution API directly with Dify AI for seamless trigger management and multiple agents.
 
 - [OpenAI](https://openai.com/):
   - Integrate your Evolution API with OpenAI for AI capabilities, including audio-to-text conversion, available across all Evolution integrations.
-
-- Amazon S3 / Minio:
-  - Store media files received in [Amazon S3](https://aws.amazon.com/pt/s3/) or [Minio](https://min.io/).
 
 ## Community & Feedback
 

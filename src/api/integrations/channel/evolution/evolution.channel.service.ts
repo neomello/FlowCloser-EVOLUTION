@@ -7,13 +7,12 @@ import {
   SendMediaDto,
   SendTextDto,
 } from '@api/dto/sendMessage.dto';
-import * as s3Service from '@api/integrations/storage/s3/libs/minio.server';
 import { PrismaRepository } from '@api/repository/repository.service';
 import { chatbotController } from '@api/server.module';
 import { CacheService } from '@api/services/cache.service';
 import { ChannelStartupService } from '@api/services/channel.service';
 import { Events, wa } from '@api/types/wa.types';
-import { AudioConverter, Chatwoot, ConfigService, Openai, S3 } from '@config/env.config';
+import { AudioConverter, Chatwoot, ConfigService, Openai } from '@config/env.config';
 import { BadRequestException, InternalServerErrorException } from '@exceptions';
 import { createJid } from '@utils/createJid';
 import { sendTelemetry } from '@utils/sendTelemetry';
@@ -22,7 +21,6 @@ import { isBase64, isURL } from 'class-validator';
 import EventEmitter2 from 'eventemitter2';
 import FormData from 'form-data';
 import mimeTypes from 'mime-types';
-import { join } from 'path';
 import { v4 } from 'uuid';
 
 export class EvolutionStartupService extends ChannelStartupService {
@@ -455,54 +453,7 @@ export class EvolutionStartupService extends ChannelStartupService {
       const { base64 } = messageRaw.message;
       delete messageRaw.message.base64;
 
-      if (base64 || file || audioFile) {
-        if (this.configService.get<S3>('S3').ENABLE) {
-          try {
-            // Verificação adicional para garantir que há conteúdo de mídia real
-            const hasRealMedia = this.hasValidMediaContent(messageRaw);
-
-            if (!hasRealMedia) {
-              this.logger.warn('Message detected as media but contains no valid media content');
-            } else {
-              const fileBuffer = audioFile?.buffer || file?.buffer;
-              const buffer = base64 ? Buffer.from(base64, 'base64') : fileBuffer;
-
-              let mediaType: string;
-              let mimetype = audioFile?.mimetype || file.mimetype;
-
-              if (messageRaw.messageType === 'documentMessage') {
-                mediaType = 'document';
-                mimetype = !mimetype ? 'application/pdf' : mimetype;
-              } else if (messageRaw.messageType === 'imageMessage') {
-                mediaType = 'image';
-                mimetype = !mimetype ? 'image/png' : mimetype;
-              } else if (messageRaw.messageType === 'audioMessage') {
-                mediaType = 'audio';
-                mimetype = !mimetype ? 'audio/mp4' : mimetype;
-              } else if (messageRaw.messageType === 'videoMessage') {
-                mediaType = 'video';
-                mimetype = !mimetype ? 'video/mp4' : mimetype;
-              }
-
-              const fileName = `${messageRaw.key.id}.${mimetype.split('/')[1]}`;
-
-              const size = buffer.byteLength;
-
-              const fullName = join(`${this.instance.id}`, messageRaw.key.remoteJid, mediaType, fileName);
-
-              await s3Service.uploadFile(fullName, buffer, size, {
-                'Content-Type': mimetype,
-              });
-
-              const mediaUrl = await s3Service.getObjectUrl(fullName);
-
-              messageRaw.message.mediaUrl = mediaUrl;
-            }
-          } catch (error) {
-            this.logger.error(['Error on upload file to minio', error?.message, error?.stack]);
-          }
-        }
-      }
+      // S3 storage integration removed
 
       this.logger.log(messageRaw);
 

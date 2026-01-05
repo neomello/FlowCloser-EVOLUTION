@@ -35,8 +35,6 @@ import { OpenaiService } from './integrations/chatbot/openai/services/openai.ser
 import { TypebotController } from './integrations/chatbot/typebot/controllers/typebot.controller';
 import { TypebotService } from './integrations/chatbot/typebot/services/typebot.service';
 import { EventManager } from './integrations/event/event.manager';
-import { S3Controller } from './integrations/storage/s3/controllers/s3.controller';
-import { S3Service } from './integrations/storage/s3/services/s3.service';
 import { ProviderFiles } from './provider/sessions';
 import { PrismaRepository } from './repository/repository.service';
 import { CacheService } from './services/cache.service';
@@ -71,9 +69,6 @@ export const waMonitor = new WAMonitoringService(
   chatwootCache,
   baileysCache,
 );
-
-const s3Service = new S3Service(prismaRepository);
-export const s3Controller = new S3Controller(s3Service);
 
 const templateService = new TemplateService(waMonitor, prismaRepository, configService);
 export const templateController = new TemplateController(templateService);

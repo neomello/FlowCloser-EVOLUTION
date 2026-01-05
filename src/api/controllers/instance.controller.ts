@@ -175,18 +175,6 @@ export class InstanceController {
             webhookByEvents: instanceData?.webhook?.byEvents,
             webhookBase64: instanceData?.webhook?.base64,
           },
-          websocket: {
-            enabled: instanceData?.websocket?.enabled,
-          },
-          rabbitmq: {
-            enabled: instanceData?.rabbitmq?.enabled,
-          },
-          nats: {
-            enabled: instanceData?.nats?.enabled,
-          },
-          sqs: {
-            enabled: instanceData?.sqs?.enabled,
-          },
           settings,
           qrcode: getQrcode,
         };
@@ -268,18 +256,6 @@ export class InstanceController {
           webhookHeaders: instanceData?.webhook?.headers,
           webhookByEvents: instanceData?.webhook?.byEvents,
           webhookBase64: instanceData?.webhook?.base64,
-        },
-        websocket: {
-          enabled: instanceData?.websocket?.enabled,
-        },
-        rabbitmq: {
-          enabled: instanceData?.rabbitmq?.enabled,
-        },
-        nats: {
-          enabled: instanceData?.nats?.enabled,
-        },
-        sqs: {
-          enabled: instanceData?.sqs?.enabled,
         },
         settings,
         chatwoot: {
