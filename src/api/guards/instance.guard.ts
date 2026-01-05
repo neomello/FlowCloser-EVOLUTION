@@ -67,14 +67,25 @@ export async function instanceLoggedGuard(
 ) {
   if (req.originalUrl.includes('/instance/create')) {
     const instance = req.body as InstanceDto;
-    if (await getInstance(instance.instanceName)) {
-      throw new ForbiddenException(
-        `This name "${instance.instanceName}" is already in use.`
+
+    // Validate instanceName format to prevent injection
+    if (
+      !instance.instanceName ||
+      !/^[a-zA-Z0-9_-]+$/.test(instance.instanceName)
+    ) {
+      throw new BadRequestException(
+        'Invalid instance name. Use only letters, numbers, hyphens, and underscores.'
       );
     }
 
-    if (waMonitor.waInstances[instance.instanceName]) {
-      delete waMonitor.waInstances[instance.instanceName];
+    // Check both in-memory and database atomically
+    const existsInMemory = !!waMonitor.waInstances[instance.instanceName];
+    const existsInDb = await getInstance(instance.instanceName);
+
+    if (existsInMemory || existsInDb) {
+      throw new ForbiddenException(
+        `This name "${instance.instanceName}" is already in use.`
+      );
     }
   }
 

@@ -14,7 +14,6 @@ import {
 import { Logger } from '@config/logger.config';
 import { INSTANCE_DIR, STORE_DIR } from '@config/path.config';
 import { NotFoundException } from '@exceptions';
-import { execFileSync } from 'child_process';
 import EventEmitter2 from 'eventemitter2';
 import { rmSync } from 'fs';
 import { join } from 'path';
@@ -220,9 +219,22 @@ export class WAMonitoringService {
   }
 
   public async cleaningStoreData(instanceName: string) {
+    // Sanitize instanceName to prevent path traversal attacks
+    const sanitizedName = instanceName.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!sanitizedName || sanitizedName !== instanceName) {
+      this.logger.warn(`Invalid instance name detected: ${instanceName}`);
+      return;
+    }
+
     if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED) {
-      const instancePath = join(STORE_DIR, 'chatwoot', instanceName);
-      execFileSync('rm', ['-rf', instancePath]);
+      const instancePath = join(STORE_DIR, 'chatwoot', sanitizedName);
+      // Validate path is within expected directory
+      const normalizedPath = join(STORE_DIR, 'chatwoot', sanitizedName);
+      if (!normalizedPath.startsWith(join(STORE_DIR, 'chatwoot'))) {
+        this.logger.error(`Path traversal attempt blocked: ${instanceName}`);
+        return;
+      }
+      rmSync(instancePath, { recursive: true, force: true });
     }
 
     const instance = await this.prismaRepository.instance.findFirst({

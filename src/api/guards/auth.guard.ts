@@ -3,7 +3,26 @@ import { prismaRepository } from '@api/server.module';
 import { Auth, configService, Database } from '@config/env.config';
 import { Logger } from '@config/logger.config';
 import { ForbiddenException, UnauthorizedException } from '@exceptions';
+import { timingSafeEqual } from 'crypto';
 import { NextFunction, Request, Response } from 'express';
+
+function safeCompare(a: string, b: string): boolean {
+  if (!a || !b) return false;
+  try {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) {
+      // Prevent length-based timing attack by comparing with a buffer of same length
+      const padded = Buffer.alloc(bufA.length);
+      bufB.copy(padded);
+      timingSafeEqual(bufA, padded);
+      return false;
+    }
+    return timingSafeEqual(bufA, bufB);
+  } catch {
+    return false;
+  }
+}
 
 const logger = new Logger('GUARD');
 
@@ -16,20 +35,21 @@ async function apikey(req: Request, _: Response, next: NextFunction) {
     throw new UnauthorizedException();
   }
 
-  if (env.KEY === key) {
+  if (safeCompare(env.KEY, key)) {
     return next();
   }
 
+  // Rotas sensíveis exigem API key global
   if (
-    (req.originalUrl.includes('/instance/create') ||
-      req.originalUrl.includes('/instance/fetchInstances')) &&
-    !key
+    req.originalUrl.includes('/instance/create') ||
+    req.originalUrl.includes('/instance/fetchInstances')
   ) {
     throw new ForbiddenException(
-      'Missing global api key',
-      'The global api key must be set'
+      'Global API key required',
+      'These endpoints require the global API key, not instance tokens'
     );
   }
+
   const param = req.params as unknown as InstanceDto;
 
   try {
@@ -37,7 +57,7 @@ async function apikey(req: Request, _: Response, next: NextFunction) {
       const instance = await prismaRepository.instance.findUnique({
         where: { name: param.instanceName },
       });
-      if (instance.token === key) {
+      if (instance?.token && safeCompare(instance.token, key)) {
         return next();
       }
     } else {

@@ -507,7 +507,16 @@ export class ConfigService {
       },
       AUTHENTICATION: {
         API_KEY: {
-          KEY: process.env.AUTHENTICATION_API_KEY || 'BQYHJGJHJ',
+          KEY: (() => {
+            const key = process.env.AUTHENTICATION_API_KEY;
+            if (!key || key === 'BQYHJGJHJ') {
+              console.error(
+                '\x1b[31m[SECURITY WARNING]\x1b[0m AUTHENTICATION_API_KEY is not set or using default value! ' +
+                  'Set a secure API key in environment variables.'
+              );
+            }
+            return key || '';
+          })(),
         },
         EXPOSE_IN_FETCH_INSTANCES:
           process.env?.AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES === 'true',

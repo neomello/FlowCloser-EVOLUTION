@@ -26,8 +26,15 @@ export const instanceSchema: JSONSchema7 = {
   type: 'object',
   properties: {
     // Instance
-    instanceName: { type: 'string' },
-    token: { type: 'string' },
+    instanceName: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 100,
+      pattern: '^[a-zA-Z0-9_-]+$',
+      description:
+        'Instance name must be 1-100 characters, alphanumeric with hyphens/underscores only',
+    },
+    token: { type: 'string', minLength: 8, maxLength: 256 },
     number: { type: 'string', pattern: '^\\d+[\\.@\\w-]+' },
     businessId: { type: 'string' },
     qrcode: { type: 'boolean' },

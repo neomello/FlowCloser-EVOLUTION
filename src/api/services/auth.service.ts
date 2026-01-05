@@ -4,16 +4,23 @@ import { BadRequestException } from '@exceptions';
 export class AuthService {
   constructor(private readonly prismaRepository: PrismaRepository) {}
 
-  public async checkDuplicateToken(token: string) {
-    if (!token) {
+  public async checkDuplicateToken(token: string): Promise<boolean> {
+    // Empty tokens are auto-generated, skip duplicate check for them
+    if (!token || token.trim().length === 0) {
       return true;
     }
 
-    const instances = await this.prismaRepository.instance.findMany({
+    // Validate token format (basic security check)
+    if (token.length < 8) {
+      throw new BadRequestException('Token must be at least 8 characters long');
+    }
+
+    // Look up instance with the given token; throw if method is missing
+    const existingInstance = await this.prismaRepository.instance.findFirst({
       where: { token },
     });
 
-    if (instances.length > 0) {
+    if (existingInstance) {
       throw new BadRequestException('Token already exists');
     }
 

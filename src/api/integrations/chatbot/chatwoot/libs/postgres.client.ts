@@ -10,31 +10,40 @@ class Postgres {
   private connected = false;
 
   getConnection(connectionString: string) {
-    if (this.connected) {
-      return this.pool;
-    } else {
-      this.pool = new Pool({
-        connectionString,
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      });
-
-      this.pool.on('error', () => {
-        this.logger.error('postgres disconnected');
-        this.connected = false;
-      });
-
-      try {
-        this.connected = true;
-      } catch (e) {
-        this.connected = false;
-        this.logger.error('postgres connect exception caught: ' + e);
-        return null;
-      }
-
+    if (this.connected && this.pool) {
       return this.pool;
     }
+
+    // Parse connection string to check if SSL should be enabled
+    const useSSL =
+      connectionString.includes('sslmode=require') ||
+      connectionString.includes('ssl=true');
+
+    this.pool = new Pool({
+      connectionString,
+      // Pool configuration for production
+      max: 20, // Maximum pool size
+      min: 2, // Minimum pool size
+      idleTimeoutMillis: 30000, // Close idle clients after 30s
+      connectionTimeoutMillis: 10000, // Connection timeout 10s
+      ...(useSSL && {
+        ssl: {
+          rejectUnauthorized: process.env.NODE_ENV === 'production',
+        },
+      }),
+    });
+
+    this.pool.on('error', (err) => {
+      this.logger.error(`PostgreSQL pool error: ${err.message}`);
+      this.connected = false;
+    });
+
+    this.pool.on('connect', () => {
+      this.connected = true;
+    });
+
+    this.connected = true;
+    return this.pool;
   }
 
   getChatwootConnection() {

@@ -1,0 +1,110 @@
+// This is auto-generated Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Instance {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  token       String   @unique
+  number      String?
+  integration String?
+
+  // Relations
+  Chatwoot      Chatwoot?
+  Proxy         Proxy?
+  Rabbitmq      Rabbitmq?
+  Nats          Nats?
+  contacts      Contact[]
+  chats         Chat[]
+  messages      Message[]
+  messageUpdates MessageUpdate[]
+  openaiSetting OpenaiSetting?
+
+  @@map("instances")
+}
+
+model Chatwoot {
+  id            String @id @default(cuid())
+  instanceId    String @unique
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("chatwoots")
+}
+
+model Proxy {
+  id            String @id @default(cuid())
+  instanceId    String @unique
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("proxies")
+}
+
+model Rabbitmq {
+  id            String @id @default(cuid())
+  instanceId    String @unique
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("rabbitmqs")
+}
+
+model Nats {
+  id            String @id @default(cuid())
+  instanceId    String @unique
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("nats")
+}
+
+model Contact {
+  id            String @id @default(cuid())
+  instanceId    String
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  messages      Message[]
+
+  @@map("contacts")
+}
+
+model Chat {
+  id            String @id @default(cuid())
+  instanceId    String
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  messages      Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id            String @id @default(cuid())
+  instanceId    String
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  contactId     String
+  contact       Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  chatId        String
+  chat          Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  messageUpdate MessageUpdate?
+
+  @@map("messages")
+}
+
+model MessageUpdate {
+  id            String @id @default(cuid())
+  instanceId    String
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  messageId     String @unique
+  message       Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("message_updates")
+}
+
+model OpenaiSetting {
+  id            String @id @default(cuid())
+  instanceId    String @unique
+  instance      Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("openai_settings")
+}

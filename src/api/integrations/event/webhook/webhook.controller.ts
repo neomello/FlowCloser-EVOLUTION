@@ -4,7 +4,7 @@ import { WAMonitoringService } from '@api/services/monitor.service';
 import { wa } from '@api/types/wa.types';
 import { configService, Log, Webhook } from '@config/env.config';
 import { Logger } from '@config/logger.config';
-// import { BadRequestException } from '@exceptions';
+import { BadRequestException } from '@exceptions';
 import axios, { AxiosInstance } from 'axios';
 import * as jwt from 'jsonwebtoken';
 
@@ -31,9 +31,31 @@ export class WebhookController
     instanceName: string,
     data: EventDto
   ): Promise<wa.LocalWebHook> {
-    // if (!/^(https?:\/\/)/.test(data.webhook.url)) {
-    //   throw new BadRequestException('Invalid "url" property');
-    // }
+    // Validate webhook URL to prevent SSRF attacks
+    if (data.webhook?.enabled && data.webhook?.url) {
+      const url = data.webhook.url;
+      if (!/^https?:\/\/.+/.test(url)) {
+        throw new BadRequestException(
+          'Invalid webhook URL: must start with http:// or https://'
+        );
+      }
+      // Block internal network access (SSRF prevention)
+      const blockedPatterns = [
+        /^https?:\/\/localhost/i,
+        /^https?:\/\/127\./,
+        /^https?:\/\/10\./,
+        /^https?:\/\/172\.(1[6-9]|2\d|3[01])\./,
+        /^https?:\/\/192\.168\./,
+        /^https?:\/\/0\.0\.0\.0/,
+        /^https?:\/\/\[::1\]/,
+      ];
+      if (blockedPatterns.some((pattern) => pattern.test(url))) {
+        this.logger.warn(`SSRF attempt blocked: ${url}`);
+        throw new BadRequestException(
+          'Invalid webhook URL: internal network addresses not allowed'
+        );
+      }
+    }
 
     if (!data.webhook?.enabled) {
       data.webhook.events = [];
@@ -75,7 +97,6 @@ export class WebhookController
     serverUrl,
     dateTime,
     sender,
-    apiKey,
     local,
     integration,
     extra,
@@ -115,7 +136,7 @@ export class WebhookController
       date_time: dateTime,
       sender,
       server_url: serverUrl,
-      apikey: apiKey,
+      // SECURITY: API key removed from webhook payload to prevent credential leakage
     };
 
     if (local && instance?.enabled) {
