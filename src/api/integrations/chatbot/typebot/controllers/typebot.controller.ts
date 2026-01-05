@@ -12,11 +12,14 @@ import axios from 'axios';
 
 import { BaseChatbotController } from '../../base-chatbot.controller';
 
-export class TypebotController extends BaseChatbotController<TypebotModel, TypebotDto> {
+export class TypebotController extends BaseChatbotController<
+  TypebotModel,
+  TypebotDto
+> {
   constructor(
     private readonly typebotService: TypebotService,
     prismaRepository: PrismaRepository,
-    waMonitor: WAMonitoringService,
+    waMonitor: WAMonitoringService
   ) {
     super(prismaRepository, waMonitor);
 
@@ -32,7 +35,9 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
 
   protected getFallbackBotId(settings: any): string | undefined {
     return settings?.typebotIdFallback;
@@ -62,7 +67,11 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
   }
 
   // Implementation for bot-specific duplicate validation on update
-  protected async validateNoDuplicatesOnUpdate(botId: string, instanceId: string, data: TypebotDto): Promise<void> {
+  protected async validateNoDuplicatesOnUpdate(
+    botId: string,
+    instanceId: string,
+    data: TypebotDto
+  ): Promise<void> {
     const checkDuplicate = await this.botRepository.findFirst({
       where: {
         url: data.url,
@@ -88,7 +97,7 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
     // Map to the original processTypebot method signature
     await this.typebotService.processTypebot(
@@ -107,13 +116,14 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
       settings.stopBotFromMe,
       settings.keepOpen,
       content,
-      {}, // prefilledVariables (optional)
+      {} // prefilledVariables (optional)
     );
   }
 
   // TypeBot specific method for starting a bot from API
   public async startBot(instance: InstanceDto, data: any) {
-    if (!this.integrationEnabled) throw new BadRequestException('Typebot is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Typebot is disabled');
 
     if (data.remoteJid === 'status@broadcast') return;
 
@@ -146,7 +156,8 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
       },
     });
 
-    if (this.checkIgnoreJids(defaultSettingCheck?.ignoreJids, remoteJid)) throw new Error('Jid not allowed');
+    if (this.checkIgnoreJids(defaultSettingCheck?.ignoreJids, remoteJid))
+      throw new Error('Jid not allowed');
 
     if (
       !expire ||
@@ -159,16 +170,24 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
       !debounceTime ||
       !ignoreJids
     ) {
-      if (expire === undefined || expire === null) expire = defaultSettingCheck.expire;
-      if (keywordFinish === undefined || keywordFinish === null) keywordFinish = defaultSettingCheck.keywordFinish;
-      if (delayMessage === undefined || delayMessage === null) delayMessage = defaultSettingCheck.delayMessage;
-      if (unknownMessage === undefined || unknownMessage === null) unknownMessage = defaultSettingCheck.unknownMessage;
+      if (expire === undefined || expire === null)
+        expire = defaultSettingCheck.expire;
+      if (keywordFinish === undefined || keywordFinish === null)
+        keywordFinish = defaultSettingCheck.keywordFinish;
+      if (delayMessage === undefined || delayMessage === null)
+        delayMessage = defaultSettingCheck.delayMessage;
+      if (unknownMessage === undefined || unknownMessage === null)
+        unknownMessage = defaultSettingCheck.unknownMessage;
       if (listeningFromMe === undefined || listeningFromMe === null)
         listeningFromMe = defaultSettingCheck.listeningFromMe;
-      if (stopBotFromMe === undefined || stopBotFromMe === null) stopBotFromMe = defaultSettingCheck.stopBotFromMe;
-      if (keepOpen === undefined || keepOpen === null) keepOpen = defaultSettingCheck.keepOpen;
-      if (debounceTime === undefined || debounceTime === null) debounceTime = defaultSettingCheck.debounceTime;
-      if (ignoreJids === undefined || ignoreJids === null) ignoreJids = defaultSettingCheck.ignoreJids;
+      if (stopBotFromMe === undefined || stopBotFromMe === null)
+        stopBotFromMe = defaultSettingCheck.stopBotFromMe;
+      if (keepOpen === undefined || keepOpen === null)
+        keepOpen = defaultSettingCheck.keepOpen;
+      if (debounceTime === undefined || debounceTime === null)
+        debounceTime = defaultSettingCheck.debounceTime;
+      if (ignoreJids === undefined || ignoreJids === null)
+        ignoreJids = defaultSettingCheck.ignoreJids;
 
       if (!defaultSettingCheck) {
         await this.settings(instance, {
@@ -188,9 +207,11 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
     const prefilledVariables: any = {};
 
     if (variables?.length) {
-      variables.forEach((variable: { name: string | number; value: string }) => {
-        prefilledVariables[variable.name] = variable.value;
-      });
+      variables.forEach(
+        (variable: { name: string | number; value: string }) => {
+          prefilledVariables[variable.name] = variable.value;
+        }
+      );
     }
 
     if (startSession) {
@@ -245,7 +266,7 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
         stopBotFromMe,
         keepOpen,
         'init',
-        prefilledVariables,
+        prefilledVariables
       );
     } else {
       const id = Math.floor(Math.random() * 10000000000).toString();
@@ -287,16 +308,19 @@ export class TypebotController extends BaseChatbotController<TypebotModel, Typeb
           remoteJid,
           request.data.messages,
           request.data.input,
-          request.data.clientSideActions,
+          request.data.clientSideActions
         );
 
-        this.waMonitor.waInstances[instance.instanceName].sendDataWebhook(Events.TYPEBOT_START, {
-          remoteJid: remoteJid,
-          url: url,
-          typebot: typebot,
-          variables: variables,
-          sessionId: id,
-        });
+        this.waMonitor.waInstances[instance.instanceName].sendDataWebhook(
+          Events.TYPEBOT_START,
+          {
+            remoteJid: remoteJid,
+            url: url,
+            typebot: typebot,
+            variables: variables,
+            sessionId: id,
+          }
+        );
       } catch (error) {
         this.logger.error(error);
         return;

@@ -15,7 +15,8 @@ export class ChatwootRouter extends RouterBroker {
           request: req,
           schema: chatwootSchema,
           ClassRef: ChatwootDto,
-          execute: (instance, data) => chatwootController.createChatwoot(instance, data),
+          execute: (instance, data) =>
+            chatwootController.createChatwoot(instance, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);
@@ -35,7 +36,8 @@ export class ChatwootRouter extends RouterBroker {
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance, data) => chatwootController.receiveWebhook(instance, data),
+          execute: (instance, data) =>
+            chatwootController.receiveWebhook(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);

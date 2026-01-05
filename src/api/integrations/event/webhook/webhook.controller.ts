@@ -8,16 +8,29 @@ import { Logger } from '@config/logger.config';
 import axios, { AxiosInstance } from 'axios';
 import * as jwt from 'jsonwebtoken';
 
-import { EmitData, EventController, EventControllerInterface } from '../event.controller';
+import {
+  EmitData,
+  EventController,
+  EventControllerInterface,
+} from '../event.controller';
 
-export class WebhookController extends EventController implements EventControllerInterface {
+export class WebhookController
+  extends EventController
+  implements EventControllerInterface
+{
   private readonly logger = new Logger('WebhookController');
 
-  constructor(prismaRepository: PrismaRepository, waMonitor: WAMonitoringService) {
+  constructor(
+    prismaRepository: PrismaRepository,
+    waMonitor: WAMonitoringService
+  ) {
     super(prismaRepository, waMonitor, true, 'webhook');
   }
 
-  override async set(instanceName: string, data: EventDto): Promise<wa.LocalWebHook> {
+  override async set(
+    instanceName: string,
+    data: EventDto
+  ): Promise<wa.LocalWebHook> {
     // if (!/^(https?:\/\/)/.test(data.webhook.url)) {
     //   throw new BadRequestException('Invalid "url" property');
     // }
@@ -75,7 +88,9 @@ export class WebhookController extends EventController implements EventControlle
 
     const webhookConfig = configService.get<Webhook>('WEBHOOK');
     const webhookLocal = instance?.events;
-    const webhookHeaders = { ...((instance?.headers as Record<string, string>) || {}) };
+    const webhookHeaders = {
+      ...((instance?.headers as Record<string, string>) || {}),
+    };
 
     if (webhookHeaders && 'jwt_key' in webhookHeaders) {
       const jwtKey = webhookHeaders['jwt_key'];
@@ -95,7 +110,8 @@ export class WebhookController extends EventController implements EventControlle
       event,
       instance: instanceName,
       data,
-      destination: instance?.url || `${webhookConfig.GLOBAL.URL}/${transformedWe}`,
+      destination:
+        instance?.url || `${webhookConfig.GLOBAL.URL}/${transformedWe}`,
       date_time: dateTime,
       sender,
       server_url: serverUrl,
@@ -130,7 +146,13 @@ export class WebhookController extends EventController implements EventControlle
               timeout: webhookConfig.REQUEST?.TIMEOUT_MS ?? 30000,
             });
 
-            await this.retryWebhookRequest(httpService, webhookData, `${origin}.sendData-Webhook`, baseURL, serverUrl);
+            await this.retryWebhookRequest(
+              httpService,
+              webhookData,
+              `${origin}.sendData-Webhook`,
+              baseURL,
+              serverUrl
+            );
           }
         } catch (error) {
           this.logger.error({
@@ -179,7 +201,7 @@ export class WebhookController extends EventController implements EventControlle
               webhookData,
               `${origin}.sendData-Webhook-Global`,
               globalURL,
-              serverUrl,
+              serverUrl
             );
           }
         } catch (error) {
@@ -207,15 +229,19 @@ export class WebhookController extends EventController implements EventControlle
     baseURL: string,
     serverUrl: string,
     maxRetries?: number,
-    delaySeconds?: number,
+    delaySeconds?: number
   ): Promise<void> {
     const webhookConfig = configService.get<Webhook>('WEBHOOK');
-    const maxRetryAttempts = maxRetries ?? webhookConfig.RETRY?.MAX_ATTEMPTS ?? 10;
-    const initialDelay = delaySeconds ?? webhookConfig.RETRY?.INITIAL_DELAY_SECONDS ?? 5;
-    const useExponentialBackoff = webhookConfig.RETRY?.USE_EXPONENTIAL_BACKOFF ?? true;
+    const maxRetryAttempts =
+      maxRetries ?? webhookConfig.RETRY?.MAX_ATTEMPTS ?? 10;
+    const initialDelay =
+      delaySeconds ?? webhookConfig.RETRY?.INITIAL_DELAY_SECONDS ?? 5;
+    const useExponentialBackoff =
+      webhookConfig.RETRY?.USE_EXPONENTIAL_BACKOFF ?? true;
     const maxDelay = webhookConfig.RETRY?.MAX_DELAY_SECONDS ?? 300;
     const jitterFactor = webhookConfig.RETRY?.JITTER_FACTOR ?? 0.2;
-    const nonRetryableStatusCodes = webhookConfig.RETRY?.NON_RETRYABLE_STATUS_CODES ?? [400, 401, 403, 404, 422];
+    const nonRetryableStatusCodes = webhookConfig.RETRY
+      ?.NON_RETRYABLE_STATUS_CODES ?? [400, 401, 403, 404, 422];
 
     let attempts = 0;
 
@@ -235,7 +261,10 @@ export class WebhookController extends EventController implements EventControlle
 
         const isTimeout = error.code === 'ECONNABORTED';
 
-        if (error?.response?.status && nonRetryableStatusCodes.includes(error.response.status)) {
+        if (
+          error?.response?.status &&
+          nonRetryableStatusCodes.includes(error.response.status)
+        ) {
           this.logger.error({
             local: `${origin}`,
             message: `Erro não recuperável (${error.response.status}): ${error?.message}. Cancelando retentativas.`,
@@ -267,7 +296,10 @@ export class WebhookController extends EventController implements EventControlle
 
         let nextDelay = initialDelay;
         if (useExponentialBackoff) {
-          nextDelay = Math.min(initialDelay * Math.pow(2, attempts - 1), maxDelay);
+          nextDelay = Math.min(
+            initialDelay * Math.pow(2, attempts - 1),
+            maxDelay
+          );
 
           const jitter = nextDelay * jitterFactor * (Math.random() * 2 - 1);
           nextDelay = Math.max(initialDelay, nextDelay + jitter);

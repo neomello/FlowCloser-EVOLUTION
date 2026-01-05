@@ -22,8 +22,11 @@ function getAvailableNumbers(remoteJid: string) {
   // Brazilian numbers
   if (remoteJid.startsWith('55')) {
     const numberWithDigit =
-      number.slice(4, 5) === '9' && number.length === 13 ? number : `${number.slice(0, 4)}9${number.slice(4)}`;
-    const numberWithoutDigit = number.length === 12 ? number : number.slice(0, 4) + number.slice(5);
+      number.slice(4, 5) === '9' && number.length === 13
+        ? number
+        : `${number.slice(0, 4)}9${number.slice(4)}`;
+    const numberWithoutDigit =
+      number.length === 12 ? number : number.slice(0, 4) + number.slice(5);
 
     numbersAvailable.push(numberWithDigit);
     numbersAvailable.push(numberWithoutDigit);
@@ -44,7 +47,8 @@ function getAvailableNumbers(remoteJid: string) {
       number.slice(2, 3) === prefix && number.length === 13
         ? number
         : `${number.slice(0, 2)}${prefix}${number.slice(2)}`;
-    const numberWithoutDigit = number.length === 12 ? number : number.slice(0, 2) + number.slice(3);
+    const numberWithoutDigit =
+      number.length === 12 ? number : number.slice(0, 2) + number.slice(3);
 
     numbersAvailable.push(numberWithDigit);
     numbersAvailable.push(numberWithoutDigit);
@@ -85,7 +89,10 @@ export async function saveOnWhatsappCache(data: ISaveOnWhatsappCacheParams[]) {
       }
 
       const altJidNormalized = normalizeJid(item.remoteJidAlt);
-      const lidAltJid = altJidNormalized && altJidNormalized.includes('@lid') ? altJidNormalized : null;
+      const lidAltJid =
+        altJidNormalized && altJidNormalized.includes('@lid')
+          ? altJidNormalized
+          : null;
 
       const baseJids = [remoteJid]; // Garante que o remoteJid esteja na lista inicial
       if (lidAltJid) {
@@ -108,7 +115,7 @@ export async function saveOnWhatsappCache(data: ISaveOnWhatsappCacheParams[]) {
       });
 
       logger.verbose(
-        `[saveOnWhatsappCache] Register exists for [${expandedJids.join(',')}]? => ${existingRecord ? existingRecord.remoteJid : 'Not found'}`,
+        `[saveOnWhatsappCache] Register exists for [${expandedJids.join(',')}]? => ${existingRecord ? existingRecord.remoteJid : 'Not found'}`
       );
 
       // 2. Unifica todos os JIDs usando um Set para garantir valores únicos
@@ -119,14 +126,17 @@ export async function saveOnWhatsappCache(data: ISaveOnWhatsappCacheParams[]) {
       }
 
       if (existingRecord?.jidOptions) {
-        existingRecord.jidOptions.split(',').forEach((jid) => finalJidOptions.add(jid));
+        existingRecord.jidOptions
+          .split(',')
+          .forEach((jid) => finalJidOptions.add(jid));
       }
 
       // 3. Prepara o payload final
       // Ordena os JIDs para garantir consistência na string final
       const sortedJidOptions = [...finalJidOptions].sort();
       const newJidOptionsString = sortedJidOptions.join(',');
-      const newLid = item.lid === 'lid' || item.remoteJid?.includes('@lid') ? 'lid' : null;
+      const newLid =
+        item.lid === 'lid' || item.remoteJid?.includes('@lid') ? 'lid' : null;
 
       const dataPayload = {
         remoteJid: remoteJid,
@@ -147,13 +157,15 @@ export async function saveOnWhatsappCache(data: ISaveOnWhatsappCacheParams[]) {
           existingRecord.lid === dataPayload.lid;
 
         if (isDataSame) {
-          logger.verbose(`[saveOnWhatsappCache] Data for ${remoteJid} is already up-to-date. Skipping update.`);
+          logger.verbose(
+            `[saveOnWhatsappCache] Data for ${remoteJid} is already up-to-date. Skipping update.`
+          );
           return; // Pula para o próximo item
         }
 
         // Os dados são diferentes, então atualiza
         logger.verbose(
-          `[saveOnWhatsappCache] Register exists, updating: remoteJid=${remoteJid}, jidOptions=${dataPayload.jidOptions}, lid=${dataPayload.lid}`,
+          `[saveOnWhatsappCache] Register exists, updating: remoteJid=${remoteJid}, jidOptions=${dataPayload.jidOptions}, lid=${dataPayload.lid}`
         );
         await prismaRepository.isOnWhatsapp.update({
           where: { id: existingRecord.id },
@@ -162,7 +174,7 @@ export async function saveOnWhatsappCache(data: ISaveOnWhatsappCacheParams[]) {
       } else {
         // Cria nova entrada
         logger.verbose(
-          `[saveOnWhatsappCache] Register does not exist, creating: remoteJid=${remoteJid}, jidOptions=${dataPayload.jidOptions}, lid=${dataPayload.lid}`,
+          `[saveOnWhatsappCache] Register does not exist, creating: remoteJid=${remoteJid}, jidOptions=${dataPayload.jidOptions}, lid=${dataPayload.lid}`
         );
         await prismaRepository.isOnWhatsapp.create({
           data: dataPayload,
@@ -170,7 +182,9 @@ export async function saveOnWhatsappCache(data: ISaveOnWhatsappCacheParams[]) {
       }
     } catch (e) {
       // Loga o erro mas não para a execução dos outros promises
-      logger.error(`[saveOnWhatsappCache] Error processing item for ${item.remoteJid}: `);
+      logger.error(
+        `[saveOnWhatsappCache] Error processing item for ${item.remoteJid}: `
+      );
       logger.error(e);
     }
   });
@@ -188,13 +202,23 @@ export async function getOnWhatsappCache(remoteJids: string[]) {
   }[] = [];
 
   if (configService.get<Database>('DATABASE').SAVE_DATA.IS_ON_WHATSAPP) {
-    const remoteJidsWithoutPlus = remoteJids.map((remoteJid) => getAvailableNumbers(remoteJid)).flat();
+    const remoteJidsWithoutPlus = remoteJids
+      .map((remoteJid) => getAvailableNumbers(remoteJid))
+      .flat();
 
     const onWhatsappCache = await prismaRepository.isOnWhatsapp.findMany({
       where: {
-        OR: remoteJidsWithoutPlus.map((remoteJid) => ({ jidOptions: { contains: remoteJid } })),
+        OR: remoteJidsWithoutPlus.map((remoteJid) => ({
+          jidOptions: { contains: remoteJid },
+        })),
         updatedAt: {
-          gte: dayjs().subtract(configService.get<Database>('DATABASE').SAVE_DATA.IS_ON_WHATSAPP_DAYS, 'days').toDate(),
+          gte: dayjs()
+            .subtract(
+              configService.get<Database>('DATABASE').SAVE_DATA
+                .IS_ON_WHATSAPP_DAYS,
+              'days'
+            )
+            .toDate(),
         },
       },
     });

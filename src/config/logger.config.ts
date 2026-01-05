@@ -77,7 +77,9 @@ export class Logger {
   private console(value: any, type: Type) {
     const types: Type[] = [];
 
-    this.configService.get<Log>('LOG').LEVEL.forEach((level) => types.push(Type[level]));
+    this.configService
+      .get<Log>('LOG')
+      .LEVEL.forEach((level) => types.push(Type[level]));
 
     const typeValue = typeof value;
     if (types.includes(type)) {
@@ -105,7 +107,7 @@ export class Logger {
           `[${typeValue}]` + Command.RESET,
           Color[type],
           typeValue !== 'object' ? value : '',
-          Command.RESET,
+          Command.RESET
         );
         typeValue === 'object' ? console.log(/*Level.DARK,*/ value, '\n') : '';
       } else {
@@ -118,7 +120,7 @@ export class Logger {
           `${type} `,
           `[${this.context}]`,
           `[${typeValue}]`,
-          value,
+          value
         );
       }
     }

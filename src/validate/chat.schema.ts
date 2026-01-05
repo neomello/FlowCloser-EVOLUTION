@@ -8,7 +8,7 @@ const isNotEmpty = (...propertyNames: string[]): JSONSchema7 => {
       (properties[property] = {
         minLength: 1,
         description: `The "${property}" cannot be empty`,
-      }),
+      })
   );
   return {
     if: {
@@ -255,7 +255,14 @@ export const messageUpSchema: JSONSchema7 = {
         participant: { type: 'string' },
         status: {
           type: 'string',
-          enum: ['ERROR', 'PENDING', 'SERVER_ACK', 'DELIVERY_ACK', 'READ', 'PLAYED'],
+          enum: [
+            'ERROR',
+            'PENDING',
+            'SERVER_ACK',
+            'DELIVERY_ACK',
+            'READ',
+            'PLAYED',
+          ],
         },
       },
       ...isNotEmpty('_id', 'remoteJid', 'id', 'status'),
@@ -278,14 +285,24 @@ export const privacySettingsSchema: JSONSchema7 = {
       enum: ['all', 'contacts', 'contact_blacklist', 'none'],
     },
     online: { type: 'string', enum: ['all', 'match_last_seen'] },
-    last: { type: 'string', enum: ['all', 'contacts', 'contact_blacklist', 'none'] },
+    last: {
+      type: 'string',
+      enum: ['all', 'contacts', 'contact_blacklist', 'none'],
+    },
     groupadd: {
       type: 'string',
       enum: ['all', 'contacts', 'contact_blacklist', 'none'],
     },
   },
   required: ['readreceipts', 'profile', 'status', 'online', 'last', 'groupadd'],
-  ...isNotEmpty('readreceipts', 'profile', 'status', 'online', 'last', 'groupadd'),
+  ...isNotEmpty(
+    'readreceipts',
+    'profile',
+    'status',
+    'online',
+    'last',
+    'groupadd'
+  ),
 };
 
 export const profileNameSchema: JSONSchema7 = {

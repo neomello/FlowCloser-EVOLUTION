@@ -23,7 +23,8 @@ export class EvoaiRouter extends RouterBroker {
           request: req,
           schema: evoaiSchema,
           ClassRef: EvoaiDto,
-          execute: (instance, data) => evoaiController.createBot(instance, data),
+          execute: (instance, data) =>
+            evoaiController.createBot(instance, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);
@@ -43,7 +44,8 @@ export class EvoaiRouter extends RouterBroker {
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => evoaiController.fetchBot(instance, req.params.evoaiId),
+          execute: (instance) =>
+            evoaiController.fetchBot(instance, req.params.evoaiId),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -53,21 +55,27 @@ export class EvoaiRouter extends RouterBroker {
           request: req,
           schema: evoaiSchema,
           ClassRef: EvoaiDto,
-          execute: (instance, data) => evoaiController.updateBot(instance, req.params.evoaiId, data),
+          execute: (instance, data) =>
+            evoaiController.updateBot(instance, req.params.evoaiId, data),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .delete(this.routerPath('delete/:evoaiId'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => evoaiController.deleteBot(instance, req.params.evoaiId),
-        });
+      .delete(
+        this.routerPath('delete/:evoaiId'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              evoaiController.deleteBot(instance, req.params.evoaiId),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('settings'), ...guards, async (req, res) => {
         const response = await this.dataValidate<EvoaiSettingDto>({
           request: req,
@@ -93,27 +101,34 @@ export class EvoaiRouter extends RouterBroker {
           request: req,
           schema: evoaiStatusSchema,
           ClassRef: InstanceDto,
-          execute: (instance, data) => evoaiController.changeStatus(instance, data),
+          execute: (instance, data) =>
+            evoaiController.changeStatus(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .get(this.routerPath('fetchSessions/:evoaiId'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => evoaiController.fetchSessions(instance, req.params.evoaiId),
-        });
+      .get(
+        this.routerPath('fetchSessions/:evoaiId'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              evoaiController.fetchSessions(instance, req.params.evoaiId),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('ignoreJid'), ...guards, async (req, res) => {
         const response = await this.dataValidate<IgnoreJidDto>({
           request: req,
           schema: evoaiIgnoreJidSchema,
           ClassRef: IgnoreJidDto,
-          execute: (instance, data) => evoaiController.ignoreJid(instance, data),
+          execute: (instance, data) =>
+            evoaiController.ignoreJid(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);

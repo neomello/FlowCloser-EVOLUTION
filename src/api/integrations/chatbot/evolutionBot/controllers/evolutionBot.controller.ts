@@ -7,11 +7,14 @@ import { BaseChatbotController } from '../../base-chatbot.controller';
 import { EvolutionBotDto } from '../dto/evolutionBot.dto';
 import { EvolutionBotService } from '../services/evolutionBot.service';
 
-export class EvolutionBotController extends BaseChatbotController<EvolutionBot, EvolutionBotDto> {
+export class EvolutionBotController extends BaseChatbotController<
+  EvolutionBot,
+  EvolutionBotDto
+> {
   constructor(
     private readonly evolutionBotService: EvolutionBotService,
     prismaRepository: PrismaRepository,
-    waMonitor: WAMonitoringService,
+    waMonitor: WAMonitoringService
   ) {
     super(prismaRepository, waMonitor);
 
@@ -27,7 +30,9 @@ export class EvolutionBotController extends BaseChatbotController<EvolutionBot, 
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
 
   // Implementation of abstract methods required by BaseChatbotController
 
@@ -51,7 +56,9 @@ export class EvolutionBotController extends BaseChatbotController<EvolutionBot, 
   }
 
   // Implementation for bot-specific updates
-  protected getAdditionalUpdateFields(data: EvolutionBotDto): Record<string, any> {
+  protected getAdditionalUpdateFields(
+    data: EvolutionBotDto
+  ): Record<string, any> {
     return {
       apiUrl: data.apiUrl,
       apiKey: data.apiKey,
@@ -62,7 +69,7 @@ export class EvolutionBotController extends BaseChatbotController<EvolutionBot, 
   protected async validateNoDuplicatesOnUpdate(
     botId: string,
     instanceId: string,
-    data: EvolutionBotDto,
+    data: EvolutionBotDto
   ): Promise<void> {
     const checkDuplicate = await this.botRepository.findFirst({
       where: {
@@ -89,8 +96,17 @@ export class EvolutionBotController extends BaseChatbotController<EvolutionBot, 
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
-    await this.evolutionBotService.process(instance, remoteJid, bot, session, settings, content, pushName, msg);
+    await this.evolutionBotService.process(
+      instance,
+      remoteJid,
+      bot,
+      session,
+      settings,
+      content,
+      pushName,
+      msg
+    );
   }
 }

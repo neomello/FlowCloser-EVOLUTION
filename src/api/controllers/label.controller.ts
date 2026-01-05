@@ -9,7 +9,10 @@ export class LabelController {
     return await this.waMonitor.waInstances[instanceName].fetchLabels();
   }
 
-  public async handleLabel({ instanceName }: InstanceDto, data: HandleLabelDto) {
+  public async handleLabel(
+    { instanceName }: InstanceDto,
+    data: HandleLabelDto
+  ) {
     return await this.waMonitor.waInstances[instanceName].handleLabel(data);
   }
 }

@@ -14,7 +14,7 @@ export class DifyController extends BaseChatbotController<DifyModel, DifyDto> {
   constructor(
     private readonly difyService: DifyService,
     prismaRepository: PrismaRepository,
-    waMonitor: WAMonitoringService,
+    waMonitor: WAMonitoringService
   ) {
     super(prismaRepository, waMonitor);
 
@@ -30,7 +30,9 @@ export class DifyController extends BaseChatbotController<DifyModel, DifyDto> {
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
 
   protected getFallbackBotId(settings: any): string | undefined {
     return settings?.fallbackId;
@@ -62,7 +64,11 @@ export class DifyController extends BaseChatbotController<DifyModel, DifyDto> {
   }
 
   // Implementation for bot-specific duplicate validation on update
-  protected async validateNoDuplicatesOnUpdate(botId: string, instanceId: string, data: DifyDto): Promise<void> {
+  protected async validateNoDuplicatesOnUpdate(
+    botId: string,
+    instanceId: string,
+    data: DifyDto
+  ): Promise<void> {
     const checkDuplicate = await this.botRepository.findFirst({
       where: {
         id: {
@@ -82,7 +88,8 @@ export class DifyController extends BaseChatbotController<DifyModel, DifyDto> {
 
   // Override createBot to add Dify-specific validation
   public async createBot(instance: InstanceDto, data: DifyDto) {
-    if (!this.integrationEnabled) throw new BadRequestException('Dify is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Dify is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -119,8 +126,17 @@ export class DifyController extends BaseChatbotController<DifyModel, DifyDto> {
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
-    await this.difyService.process(instance, remoteJid, bot, session, settings, content, pushName, msg);
+    await this.difyService.process(
+      instance,
+      remoteJid,
+      bot,
+      session,
+      settings,
+      content,
+      pushName,
+      msg
+    );
   }
 }

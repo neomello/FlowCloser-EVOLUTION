@@ -16,7 +16,8 @@ export class ProxyRouter extends RouterBroker {
           request: req,
           schema: proxySchema,
           ClassRef: ProxyDto,
-          execute: (instance, data) => proxyController.createProxy(instance, data),
+          execute: (instance, data) =>
+            proxyController.createProxy(instance, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);

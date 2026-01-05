@@ -8,7 +8,7 @@ const isNotEmpty = (...propertyNames: string[]): JSONSchema7 => {
       (properties[property] = {
         minLength: 1,
         description: `The "${property}" cannot be empty`,
-      }),
+      })
   );
   return {
     if: {
@@ -28,8 +28,14 @@ export const typebotSchema: JSONSchema7 = {
     description: { type: 'string' },
     url: { type: 'string' },
     typebot: { type: 'string' },
-    triggerType: { type: 'string', enum: ['all', 'keyword', 'none', 'advanced'] },
-    triggerOperator: { type: 'string', enum: ['equals', 'contains', 'startsWith', 'endsWith', 'regex'] },
+    triggerType: {
+      type: 'string',
+      enum: ['all', 'keyword', 'none', 'advanced'],
+    },
+    triggerOperator: {
+      type: 'string',
+      enum: ['equals', 'contains', 'startsWith', 'endsWith', 'regex'],
+    },
     triggerValue: { type: 'string' },
     expire: { type: 'integer' },
     keywordFinish: { type: 'string' },
@@ -81,8 +87,22 @@ export const typebotSettingSchema: JSONSchema7 = {
     typebotIdFallback: { type: 'string' },
     ignoreJids: { type: 'array', items: { type: 'string' } },
   },
-  required: ['expire', 'keywordFinish', 'delayMessage', 'unknownMessage', 'listeningFromMe', 'stopBotFromMe'],
-  ...isNotEmpty('expire', 'keywordFinish', 'delayMessage', 'unknownMessage', 'listeningFromMe', 'stopBotFromMe'),
+  required: [
+    'expire',
+    'keywordFinish',
+    'delayMessage',
+    'unknownMessage',
+    'listeningFromMe',
+    'stopBotFromMe',
+  ],
+  ...isNotEmpty(
+    'expire',
+    'keywordFinish',
+    'delayMessage',
+    'unknownMessage',
+    'listeningFromMe',
+    'stopBotFromMe'
+  ),
 };
 
 export const typebotIgnoreJidSchema: JSONSchema7 = {

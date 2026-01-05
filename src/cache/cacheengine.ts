@@ -12,7 +12,7 @@ export class CacheEngine {
 
   constructor(
     private readonly configService: ConfigService,
-    module: string,
+    module: string
   ) {
     const cacheConf = configService.get<CacheConf>('CACHE');
 

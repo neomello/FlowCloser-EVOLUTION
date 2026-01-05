@@ -1,10 +1,16 @@
 import { CacheService } from '@api/services/cache.service';
 import { Logger } from '@config/logger.config';
-import { AuthenticationCreds, AuthenticationState, initAuthCreds, proto, SignalDataTypeMap } from 'baileys';
+import {
+  AuthenticationCreds,
+  AuthenticationState,
+  initAuthCreds,
+  proto,
+  SignalDataTypeMap,
+} from 'baileys';
 
 export async function useMultiFileAuthStateRedisDb(
   instanceName: string,
-  cache: CacheService,
+  cache: CacheService
 ): Promise<{
   state: AuthenticationState;
   saveCreds: () => Promise<void>;
@@ -47,7 +53,8 @@ export async function useMultiFileAuthStateRedisDb(
     }
   }
 
-  const creds: AuthenticationCreds = (await readData('creds')) || initAuthCreds();
+  const creds: AuthenticationCreds =
+    (await readData('creds')) || initAuthCreds();
 
   return {
     state: {
@@ -65,7 +72,7 @@ export async function useMultiFileAuthStateRedisDb(
               }
 
               data[id] = value;
-            }),
+            })
           );
 
           return data;
@@ -76,7 +83,9 @@ export async function useMultiFileAuthStateRedisDb(
             for (const id in data[category]) {
               const value = data[category][id];
               const key = `${category}-${id}`;
-              tasks.push(value ? await writeData(value, key) : await removeData(key));
+              tasks.push(
+                value ? await writeData(value, key) : await removeData(key)
+              );
             }
           }
 

@@ -17,7 +17,7 @@ export class FlowiseService extends BaseChatbotService<FlowiseModel> {
     waMonitor: WAMonitoringService,
     prismaRepository: PrismaRepository,
     configService: ConfigService,
-    openaiService: OpenaiService,
+    openaiService: OpenaiService
   ) {
     super(waMonitor, prismaRepository, 'FlowiseService', configService);
     this.openaiService = openaiService;
@@ -37,9 +37,18 @@ export class FlowiseService extends BaseChatbotService<FlowiseModel> {
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
-    await this.process(instance, remoteJid, bot, session, settings, content, pushName, msg);
+    await this.process(
+      instance,
+      remoteJid,
+      bot,
+      session,
+      settings,
+      content,
+      pushName,
+      msg
+    );
   }
 
   // Implement the abstract method to send message to Flowise API
@@ -51,7 +60,7 @@ export class FlowiseService extends BaseChatbotService<FlowiseModel> {
     remoteJid: string,
     pushName: string,
     content: string,
-    msg?: any,
+    msg?: any
   ): Promise<void> {
     const payload: any = {
       question: content,
@@ -72,8 +81,13 @@ export class FlowiseService extends BaseChatbotService<FlowiseModel> {
     // Handle audio messages
     if (this.isAudioMessage(content) && msg) {
       try {
-        this.logger.debug(`[Flowise] Downloading audio for Whisper transcription`);
-        const transcription = await this.openaiService.speechToText(msg, instance);
+        this.logger.debug(
+          `[Flowise] Downloading audio for Whisper transcription`
+        );
+        const transcription = await this.openaiService.speechToText(
+          msg,
+          instance
+        );
         if (transcription) {
           payload.question = `[audio] ${transcription}`;
         }
@@ -142,7 +156,13 @@ export class FlowiseService extends BaseChatbotService<FlowiseModel> {
 
     if (message) {
       // Use the base class method to send the message to WhatsApp
-      await this.sendMessageWhatsApp(instance, remoteJid, message, settings, true);
+      await this.sendMessageWhatsApp(
+        instance,
+        remoteJid,
+        message,
+        settings,
+        true
+      );
     }
   }
 

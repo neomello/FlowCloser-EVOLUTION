@@ -11,7 +11,9 @@ type Proxy = {
   username?: string;
 };
 
-function selectProxyAgent(proxyUrl: string): HttpsProxyAgent<string> | SocksProxyAgent {
+function selectProxyAgent(
+  proxyUrl: string
+): HttpsProxyAgent<string> | SocksProxyAgent {
   const url = new URL(proxyUrl);
 
   // NOTE: The following constants are not used in the function but are defined for clarity.
@@ -41,7 +43,9 @@ function selectProxyAgent(proxyUrl: string): HttpsProxyAgent<string> | SocksProx
   }
 }
 
-export function makeProxyAgent(proxy: Proxy | string): HttpsProxyAgent<string> | SocksProxyAgent {
+export function makeProxyAgent(
+  proxy: Proxy | string
+): HttpsProxyAgent<string> | SocksProxyAgent {
   if (typeof proxy === 'string') {
     return selectProxyAgent(proxy);
   }

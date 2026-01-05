@@ -1,5 +1,8 @@
 import { authGuard } from '@api/guards/auth.guard';
-import { instanceExistsGuard, instanceLoggedGuard } from '@api/guards/instance.guard';
+import {
+  instanceExistsGuard,
+  instanceLoggedGuard,
+} from '@api/guards/instance.guard';
 import Telemetry from '@api/guards/telemetry.guard';
 import { ChannelRouter } from '@api/integrations/channel/channel.router';
 import { ChatbotRouter } from '@api/integrations/chatbot/chatbot.router';
@@ -44,9 +47,15 @@ const telemetry = new Telemetry();
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
 // Middleware for metrics IP whitelist
-const metricsIPWhitelist = (req: Request, res: Response, next: NextFunction) => {
+const metricsIPWhitelist = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const metricsConfig = configService.get('METRICS');
-  const allowedIPs = metricsConfig.ALLOWED_IPS?.split(',').map((ip) => ip.trim()) || ['127.0.0.1'];
+  const allowedIPs = metricsConfig.ALLOWED_IPS?.split(',').map((ip) =>
+    ip.trim()
+  ) || ['127.0.0.1'];
   const clientIPs = [
     req.ip,
     req.connection.remoteAddress,
@@ -122,8 +131,8 @@ if (metricsConfig.ENABLED) {
     lines.push('# TYPE evolution_environment_info gauge');
     lines.push(
       `evolution_environment_info{version="${escapeLabel(packageJson.version)}",clientName="${escapeLabel(
-        clientName,
-      )}",serverUrl="${escapeLabel(serverUrl)}"} 1`,
+        clientName
+      )}",serverUrl="${escapeLabel(serverUrl)}"} 1`
     );
 
     const instances = (waMonitor && waMonitor.waInstances) || {};
@@ -135,9 +144,13 @@ if (metricsConfig.ENABLED) {
     lines.push(`evolution_instances_total ${instanceEntries.length}`);
 
     // per-instance status
-    lines.push('# HELP evolution_instance_up 1 if instance state is open, else 0');
+    lines.push(
+      '# HELP evolution_instance_up 1 if instance state is open, else 0'
+    );
     lines.push('# TYPE evolution_instance_up gauge');
-    lines.push('# HELP evolution_instance_state Instance state as a labelled metric');
+    lines.push(
+      '# HELP evolution_instance_state Instance state as a labelled metric'
+    );
     lines.push('# TYPE evolution_instance_state gauge');
 
     for (const [name, instance] of instanceEntries) {
@@ -146,12 +159,12 @@ if (metricsConfig.ENABLED) {
       const up = state === 'open' ? 1 : 0;
 
       lines.push(
-        `evolution_instance_up{instance="${escapeLabel(name)}",integration="${escapeLabel(integration)}"} ${up}`,
+        `evolution_instance_up{instance="${escapeLabel(name)}",integration="${escapeLabel(integration)}"} ${up}`
       );
       lines.push(
         `evolution_instance_state{instance="${escapeLabel(name)}",integration="${escapeLabel(
-          integration,
-        )}",state="${escapeLabel(state)}"} 1`,
+          integration
+        )}",state="${escapeLabel(state)}"} 1`
       );
     }
 
@@ -159,13 +172,19 @@ if (metricsConfig.ENABLED) {
   });
 }
 
-if (!serverConfig.DISABLE_MANAGER) router.use('/manager', new ViewsRouter().router);
+if (!serverConfig.DISABLE_MANAGER)
+  router.use('/manager', new ViewsRouter().router);
 
 router.get('/assets/*', (req, res) => {
   const fileName = req.params[0];
 
   // Security: Reject paths containing traversal patterns
-  if (!fileName || fileName.includes('..') || fileName.includes('\\') || path.isAbsolute(fileName)) {
+  if (
+    !fileName ||
+    fileName.includes('..') ||
+    fileName.includes('\\') ||
+    path.isAbsolute(fileName)
+  ) {
     return res.status(403).send('Forbidden');
   }
 
@@ -177,7 +196,10 @@ router.get('/assets/*', (req, res) => {
   const resolvedPath = path.resolve(filePath);
   const resolvedAssetsPath = path.resolve(assetsPath);
 
-  if (!resolvedPath.startsWith(resolvedAssetsPath + path.sep) && resolvedPath !== resolvedAssetsPath) {
+  if (
+    !resolvedPath.startsWith(resolvedAssetsPath + path.sep) &&
+    resolvedPath !== resolvedAssetsPath
+  ) {
     return res.status(403).send('Forbidden');
   }
 
@@ -198,7 +220,9 @@ router
       message: 'Welcome to the Evolution API, it is working!',
       version: packageJson.version,
       clientName: databaseConfig.CONNECTION.CLIENT_NAME,
-      manager: !serverConfig.DISABLE_MANAGER ? `${req.protocol}://${req.get('host')}/manager` : undefined,
+      manager: !serverConfig.DISABLE_MANAGER
+        ? `${req.protocol}://${req.get('host')}/manager`
+        : undefined,
       documentation: `https://doc.evolution-api.com`,
       whatsappWebVersion: (await fetchLatestWaWebVersion({})).version.join('.'),
     });

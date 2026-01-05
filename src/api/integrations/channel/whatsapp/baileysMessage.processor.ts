@@ -1,10 +1,24 @@
 import { Logger } from '@config/logger.config';
 import { BaileysEventMap, MessageUpsertType, WAMessage } from 'baileys';
-import { catchError, concatMap, delay, EMPTY, from, retryWhen, Subject, Subscription, take, tap } from 'rxjs';
+import {
+  catchError,
+  concatMap,
+  delay,
+  EMPTY,
+  from,
+  retryWhen,
+  Subject,
+  Subscription,
+  take,
+  tap,
+} from 'rxjs';
 
 type MessageUpsertPayload = BaileysEventMap['messages.upsert'];
 type MountProps = {
-  onMessageReceive: (payload: MessageUpsertPayload, settings: any) => Promise<void>;
+  onMessageReceive: (
+    payload: MessageUpsertPayload,
+    settings: any
+  ) => Promise<void>;
 };
 
 export class BaileysMessageProcessor {
@@ -38,23 +52,29 @@ export class BaileysMessageProcessor {
     this.subscription = this.messageSubject
       .pipe(
         tap(({ messages }) => {
-          this.processorLogs.log(`Processing batch of ${messages.length} messages`);
+          this.processorLogs.log(
+            `Processing batch of ${messages.length} messages`
+          );
         }),
         concatMap(({ messages, type, requestId, settings }) =>
           from(onMessageReceive({ messages, type, requestId }, settings)).pipe(
             retryWhen((errors) =>
               errors.pipe(
-                tap((error) => this.processorLogs.warn(`Retrying message batch due to error: ${error.message}`)),
+                tap((error) =>
+                  this.processorLogs.warn(
+                    `Retrying message batch due to error: ${error.message}`
+                  )
+                ),
                 delay(1000), // 1 segundo de delay
-                take(3), // Máximo 3 tentativas
-              ),
-            ),
-          ),
+                take(3) // Máximo 3 tentativas
+              )
+            )
+          )
         ),
         catchError((error) => {
           this.processorLogs.error(`Error processing message batch: ${error}`);
           return EMPTY;
-        }),
+        })
       )
       .subscribe({
         error: (error) => {

@@ -3,12 +3,21 @@ import { WAMonitoringService } from '@api/services/monitor.service';
 import { Logger } from '@config/logger.config';
 import axios from 'axios';
 
-import { ChannelController, ChannelControllerInterface } from '../channel.controller';
+import {
+  ChannelController,
+  ChannelControllerInterface,
+} from '../channel.controller';
 
-export class MetaController extends ChannelController implements ChannelControllerInterface {
+export class MetaController
+  extends ChannelController
+  implements ChannelControllerInterface
+{
   private readonly logger = new Logger('MetaController');
 
-  constructor(prismaRepository: PrismaRepository, waMonitor: WAMonitoringService) {
+  constructor(
+    prismaRepository: PrismaRepository,
+    waMonitor: WAMonitoringService
+  ) {
     super(prismaRepository, waMonitor);
   }
 
@@ -16,9 +25,13 @@ export class MetaController extends ChannelController implements ChannelControll
 
   public async receiveWebhook(data: any) {
     if (data.object === 'whatsapp_business_account') {
-      if (data.entry[0]?.changes[0]?.field === 'message_template_status_update') {
+      if (
+        data.entry[0]?.changes[0]?.field === 'message_template_status_update'
+      ) {
         const template = await this.prismaRepository.template.findFirst({
-          where: { templateId: `${data.entry[0].changes[0].value.message_template_id}` },
+          where: {
+            templateId: `${data.entry[0].changes[0].value.message_template_id}`,
+          },
         });
 
         if (!template) {
@@ -40,7 +53,9 @@ export class MetaController extends ChannelController implements ChannelControll
         const numberId = entry.changes[0].value.metadata.phone_number_id;
 
         if (!numberId) {
-          this.logger.error('WebhookService -> receiveWebhookMeta -> numberId not found');
+          this.logger.error(
+            'WebhookService -> receiveWebhookMeta -> numberId not found'
+          );
           return {
             status: 'success',
           };
@@ -51,7 +66,9 @@ export class MetaController extends ChannelController implements ChannelControll
         });
 
         if (!instance) {
-          this.logger.error('WebhookService -> receiveWebhookMeta -> instance not found');
+          this.logger.error(
+            'WebhookService -> receiveWebhookMeta -> instance not found'
+          );
           return {
             status: 'success',
           };

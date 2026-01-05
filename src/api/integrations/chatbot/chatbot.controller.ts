@@ -26,7 +26,9 @@ export interface ChatbotControllerInterface {
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } };
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  };
 
   createBot(instance: InstanceDto, data: any): Promise<any>;
   findBot(instance: InstanceDto): Promise<any>;
@@ -37,8 +39,16 @@ export interface ChatbotControllerInterface {
   settings(instance: InstanceDto, data: any): Promise<any>;
   fetchSettings(instance: InstanceDto): Promise<any>;
 
-  changeStatus(instance: InstanceDto, botId: string, status: string): Promise<any>;
-  fetchSessions(instance: InstanceDto, botId: string, remoteJid?: string): Promise<any>;
+  changeStatus(
+    instance: InstanceDto,
+    botId: string,
+    status: string
+  ): Promise<any>;
+  fetchSessions(
+    instance: InstanceDto,
+    botId: string,
+    remoteJid?: string
+  ): Promise<any>;
   ignoreJid(instance: InstanceDto, data: any): Promise<any>;
 
   emit(data: EmitData): Promise<void>;
@@ -50,7 +60,10 @@ export class ChatbotController {
 
   public readonly logger = new Logger('ChatbotController');
 
-  constructor(prismaRepository: PrismaRepository, waMonitor: WAMonitoringService) {
+  constructor(
+    prismaRepository: PrismaRepository,
+    waMonitor: WAMonitoringService
+  ) {
     this.prisma = prismaRepository;
     this.monitor = waMonitor;
   }
@@ -111,11 +124,13 @@ export class ChatbotController {
     content: string,
     remoteJid: string,
     debounceTime: number,
-    callback: any,
+    callback: any
   ) {
     if (userMessageDebounce[remoteJid]) {
       userMessageDebounce[remoteJid].message += `\n${content}`;
-      this.logger.log('message debounced: ' + userMessageDebounce[remoteJid].message);
+      this.logger.log(
+        'message debounced: ' + userMessageDebounce[remoteJid].message
+      );
       clearTimeout(userMessageDebounce[remoteJid].timeoutId);
     } else {
       userMessageDebounce[remoteJid] = {
@@ -192,12 +207,16 @@ export class ChatbotController {
     botRepository: any,
     content: string,
     instance: InstanceDto,
-    session?: IntegrationSession,
+    session?: IntegrationSession
   ) {
     let findBot: any = null;
 
     if (!session) {
-      findBot = await findBotByTrigger(botRepository, content, instance.instanceId);
+      findBot = await findBotByTrigger(
+        botRepository,
+        content,
+        instance.instanceId
+      );
 
       if (!findBot) {
         return null;

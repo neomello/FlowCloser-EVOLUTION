@@ -1,7 +1,10 @@
 import { RouterBroker } from '@api/abstract/abstract.router';
 import { IgnoreJidDto } from '@api/dto/chatbot.dto';
 import { InstanceDto } from '@api/dto/instance.dto';
-import { DifyDto, DifySettingDto } from '@api/integrations/chatbot/dify/dto/dify.dto';
+import {
+  DifyDto,
+  DifySettingDto,
+} from '@api/integrations/chatbot/dify/dto/dify.dto';
 import { HttpStatus } from '@api/routes/index.router';
 import { difyController } from '@api/server.module';
 import {
@@ -42,7 +45,8 @@ export class DifyRouter extends RouterBroker {
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => difyController.fetchBot(instance, req.params.difyId),
+          execute: (instance) =>
+            difyController.fetchBot(instance, req.params.difyId),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -52,21 +56,27 @@ export class DifyRouter extends RouterBroker {
           request: req,
           schema: difySchema,
           ClassRef: DifyDto,
-          execute: (instance, data) => difyController.updateBot(instance, req.params.difyId, data),
+          execute: (instance, data) =>
+            difyController.updateBot(instance, req.params.difyId, data),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .delete(this.routerPath('delete/:difyId'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => difyController.deleteBot(instance, req.params.difyId),
-        });
+      .delete(
+        this.routerPath('delete/:difyId'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              difyController.deleteBot(instance, req.params.difyId),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('settings'), ...guards, async (req, res) => {
         const response = await this.dataValidate<DifySettingDto>({
           request: req,
@@ -92,21 +102,27 @@ export class DifyRouter extends RouterBroker {
           request: req,
           schema: difyStatusSchema,
           ClassRef: InstanceDto,
-          execute: (instance, data) => difyController.changeStatus(instance, data),
+          execute: (instance, data) =>
+            difyController.changeStatus(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .get(this.routerPath('fetchSessions/:difyId'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => difyController.fetchSessions(instance, req.params.difyId),
-        });
+      .get(
+        this.routerPath('fetchSessions/:difyId'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              difyController.fetchSessions(instance, req.params.difyId),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('ignoreJid'), ...guards, async (req, res) => {
         const response = await this.dataValidate<IgnoreJidDto>({
           request: req,

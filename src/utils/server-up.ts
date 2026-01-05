@@ -18,7 +18,7 @@ export class ServerUP {
         cert: readFileSync(FULLCHAIN),
         key: readFileSync(PRIVKEY),
       },
-      ServerUP.#app,
+      ServerUP.#app
     );
   }
 

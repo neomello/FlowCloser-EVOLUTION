@@ -45,4 +45,3 @@ jobs:
           else
             echo "markdownlint not installed, skipping..."
           fi
-

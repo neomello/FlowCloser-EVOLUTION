@@ -9,7 +9,13 @@ import { TypebotService } from '@api/integrations/chatbot/typebot/services/typeb
 import { PrismaRepository, Query } from '@api/repository/repository.service';
 import { eventManager, waMonitor } from '@api/server.module';
 import { Events, wa } from '@api/types/wa.types';
-import { Auth, Chatwoot, ConfigService, HttpServer, Proxy } from '@config/env.config';
+import {
+  Auth,
+  Chatwoot,
+  ConfigService,
+  HttpServer,
+  Proxy,
+} from '@config/env.config';
 import { Logger } from '@config/logger.config';
 import { NotFoundException } from '@exceptions';
 import { Contact, Message, Prisma } from '@prisma/client';
@@ -26,7 +32,7 @@ export class ChannelStartupService {
     public readonly configService: ConfigService,
     public readonly eventEmitter: EventEmitter2,
     public readonly prismaRepository: PrismaRepository,
-    public readonly chatwootCache: CacheService,
+    public readonly chatwootCache: CacheService
   ) {}
 
   public readonly logger = new Logger('ChannelStartupService');
@@ -42,14 +48,28 @@ export class ChannelStartupService {
     waMonitor,
     this.configService,
     this.prismaRepository,
-    this.chatwootCache,
+    this.chatwootCache
   );
 
-  public openaiService = new OpenaiService(waMonitor, this.prismaRepository, this.configService);
+  public openaiService = new OpenaiService(
+    waMonitor,
+    this.prismaRepository,
+    this.configService
+  );
 
-  public typebotService = new TypebotService(waMonitor, this.configService, this.prismaRepository, this.openaiService);
+  public typebotService = new TypebotService(
+    waMonitor,
+    this.configService,
+    this.prismaRepository,
+    this.openaiService
+  );
 
-  public difyService = new DifyService(waMonitor, this.prismaRepository, this.configService, this.openaiService);
+  public difyService = new DifyService(
+    waMonitor,
+    this.prismaRepository,
+    this.configService,
+    this.openaiService
+  );
 
   public setInstance(instance: InstanceDto) {
     this.logger.setInstance(instance.instanceName);
@@ -62,14 +82,17 @@ export class ChannelStartupService {
     this.instance.businessId = instance.businessId;
     this.instance.ownerJid = instance.ownerJid;
 
-    if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
+    if (
+      this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+      this.localChatwoot?.enabled
+    ) {
       this.chatwootService.eventWhatsapp(
         Events.STATUS_INSTANCE,
         { instanceName: this.instance.name },
         {
           instance: this.instance.name,
           status: 'created',
-        },
+        }
       );
     }
   }
@@ -193,7 +216,10 @@ export class ChannelStartupService {
     this.localSettings.syncFullHistory = data?.syncFullHistory;
     this.localSettings.wavoipToken = data?.wavoipToken;
 
-    if (this.localSettings.wavoipToken && this.localSettings.wavoipToken.length > 0) {
+    if (
+      this.localSettings.wavoipToken &&
+      this.localSettings.wavoipToken.length > 0
+    ) {
       this.client.ws.close();
       this.client.ws.connect();
     }
@@ -286,7 +312,10 @@ export class ChannelStartupService {
         },
       });
 
-      Object.assign(this.localChatwoot, { ...data, signDelimiter: data.signMsg ? data.signDelimiter : null });
+      Object.assign(this.localChatwoot, {
+        ...data,
+        signDelimiter: data.signMsg ? data.signDelimiter : null,
+      });
 
       this.clearCacheChatwoot();
       return;
@@ -314,7 +343,10 @@ export class ChannelStartupService {
       },
     });
 
-    Object.assign(this.localChatwoot, { ...data, signDelimiter: data.signMsg ? data.signDelimiter : null });
+    Object.assign(this.localChatwoot, {
+      ...data,
+      signDelimiter: data.signMsg ? data.signDelimiter : null,
+    });
 
     this.clearCacheChatwoot();
   }
@@ -334,7 +366,9 @@ export class ChannelStartupService {
       return null;
     }
 
-    const ignoreJidsArray = Array.isArray(data.ignoreJids) ? data.ignoreJids.map((event) => String(event)) : [];
+    const ignoreJidsArray = Array.isArray(data.ignoreJids)
+      ? data.ignoreJids.map((event) => String(event))
+      : [];
 
     return {
       enabled: data?.enabled,
@@ -437,14 +471,15 @@ export class ChannelStartupService {
     data: T,
     local = true,
     integration?: string[],
-    extra?: Record<string, any>,
+    extra?: Record<string, any>
   ) {
     const serverUrl = this.configService.get<HttpServer>('SERVER').URL;
     const tzoffset = new Date().getTimezoneOffset() * 60000; //offset in milliseconds
     const localISOTime = new Date(Date.now() - tzoffset).toISOString();
     const now = localISOTime;
 
-    const expose = this.configService.get<Auth>('AUTHENTICATION').EXPOSE_IN_FETCH_INSTANCES;
+    const expose =
+      this.configService.get<Auth>('AUTHENTICATION').EXPOSE_IN_FETCH_INSTANCES;
 
     const instanceApikey = this.token || 'Apikey not found';
 
@@ -503,7 +538,9 @@ export class ChannelStartupService {
     };
 
     if (query?.where?.remoteJid) {
-      const remoteJid = query.where.remoteJid.includes('@') ? query.where.remoteJid : createJid(query.where.remoteJid);
+      const remoteJid = query.where.remoteJid.includes('@')
+        ? query.where.remoteJid
+        : createJid(query.where.remoteJid);
       where['remoteJid'] = remoteJid;
     }
 
@@ -525,7 +562,8 @@ export class ChannelStartupService {
       contactFindManyArgs.skip = query.offset * (validPage - 1);
     }
 
-    const contacts = await this.prismaRepository.contact.findMany(contactFindManyArgs);
+    const contacts =
+      await this.prismaRepository.contact.findMany(contactFindManyArgs);
 
     return contacts.map((contact) => {
       const remoteJid = contact.remoteJid;
@@ -607,10 +645,17 @@ export class ChannelStartupService {
 
     const timestampFilter = {};
     if (query?.where?.messageTimestamp) {
-      if (query.where.messageTimestamp['gte'] && query.where.messageTimestamp['lte']) {
+      if (
+        query.where.messageTimestamp['gte'] &&
+        query.where.messageTimestamp['lte']
+      ) {
         timestampFilter['messageTimestamp'] = {
-          gte: Math.floor(new Date(query.where.messageTimestamp['gte']).getTime() / 1000),
-          lte: Math.floor(new Date(query.where.messageTimestamp['lte']).getTime() / 1000),
+          gte: Math.floor(
+            new Date(query.where.messageTimestamp['gte']).getTime() / 1000
+          ),
+          lte: Math.floor(
+            new Date(query.where.messageTimestamp['lte']).getTime() / 1000
+          ),
         };
       }
     }
@@ -623,10 +668,23 @@ export class ChannelStartupService {
         messageType: query?.where?.messageType,
         ...timestampFilter,
         AND: [
-          keyFilters?.id ? { key: { path: ['id'], equals: keyFilters?.id } } : {},
-          keyFilters?.fromMe ? { key: { path: ['fromMe'], equals: keyFilters?.fromMe } } : {},
-          keyFilters?.remoteJid ? { key: { path: ['remoteJid'], equals: keyFilters?.remoteJid } } : {},
-          keyFilters?.participants ? { key: { path: ['participants'], equals: keyFilters?.participants } } : {},
+          keyFilters?.id
+            ? { key: { path: ['id'], equals: keyFilters?.id } }
+            : {},
+          keyFilters?.fromMe
+            ? { key: { path: ['fromMe'], equals: keyFilters?.fromMe } }
+            : {},
+          keyFilters?.remoteJid
+            ? { key: { path: ['remoteJid'], equals: keyFilters?.remoteJid } }
+            : {},
+          keyFilters?.participants
+            ? {
+                key: {
+                  path: ['participants'],
+                  equals: keyFilters?.participants,
+                },
+              }
+            : {},
         ],
       },
     });
@@ -647,16 +705,30 @@ export class ChannelStartupService {
         messageType: query?.where?.messageType,
         ...timestampFilter,
         AND: [
-          keyFilters?.id ? { key: { path: ['id'], equals: keyFilters?.id } } : {},
-          keyFilters?.fromMe ? { key: { path: ['fromMe'], equals: keyFilters?.fromMe } } : {},
-          keyFilters?.remoteJid ? { key: { path: ['remoteJid'], equals: keyFilters?.remoteJid } } : {},
-          keyFilters?.participants ? { key: { path: ['participants'], equals: keyFilters?.participants } } : {},
+          keyFilters?.id
+            ? { key: { path: ['id'], equals: keyFilters?.id } }
+            : {},
+          keyFilters?.fromMe
+            ? { key: { path: ['fromMe'], equals: keyFilters?.fromMe } }
+            : {},
+          keyFilters?.remoteJid
+            ? { key: { path: ['remoteJid'], equals: keyFilters?.remoteJid } }
+            : {},
+          keyFilters?.participants
+            ? {
+                key: {
+                  path: ['participants'],
+                  equals: keyFilters?.participants,
+                },
+              }
+            : {},
         ],
       },
       orderBy: {
         messageTimestamp: 'desc',
       },
-      skip: query.offset * (query?.page === 1 ? 0 : (query?.page as number) - 1),
+      skip:
+        query.offset * (query?.page === 1 ? 0 : (query?.page as number) - 1),
       take: query.offset,
       select: {
         id: true,
@@ -701,7 +773,8 @@ export class ChannelStartupService {
         remoteJid: query.where?.remoteJid,
         keyId: query.where?.id,
       },
-      skip: query.offset * (query?.page === 1 ? 0 : (query?.page as number) - 1),
+      skip:
+        query.offset * (query?.page === 1 ? 0 : (query?.page as number) - 1),
       take: query.offset,
     });
   }
@@ -739,7 +812,9 @@ export class ChannelStartupService {
         : Prisma.sql``;
 
     const limit = query?.take ? Prisma.sql`LIMIT ${query.take}` : Prisma.sql``;
-    const offset = query?.skip ? Prisma.sql`OFFSET ${query.skip}` : Prisma.sql``;
+    const offset = query?.skip
+      ? Prisma.sql`OFFSET ${query.skip}`
+      : Prisma.sql``;
 
     const results = await this.prismaRepository.$queryRaw`
       WITH rankedMessages AS (
@@ -817,7 +892,9 @@ export class ChannelStartupService {
           windowStart: contact.windowStart,
           windowExpires: contact.windowExpires,
           windowActive: contact.windowActive,
-          lastMessage: lastMessage ? this.cleanMessageData(lastMessage) : undefined,
+          lastMessage: lastMessage
+            ? this.cleanMessageData(lastMessage)
+            : undefined,
           unreadCount: contact.unreadMessages,
           isSaved: !!contact.contactId,
         };
@@ -835,7 +912,10 @@ export class ChannelStartupService {
     const msg = message.message;
 
     // Se só tem messageContextInfo, não é mídia válida
-    if (Object.keys(msg).length === 1 && Object.prototype.hasOwnProperty.call(msg, 'messageContextInfo')) {
+    if (
+      Object.keys(msg).length === 1 &&
+      Object.prototype.hasOwnProperty.call(msg, 'messageContextInfo')
+    ) {
       return false;
     }
 
@@ -850,6 +930,8 @@ export class ChannelStartupService {
       'audioMessage',
     ];
 
-    return mediaTypes.some((type) => msg[type] && Object.keys(msg[type]).length > 0);
+    return mediaTypes.some(
+      (type) => msg[type] && Object.keys(msg[type]).length > 0
+    );
   }
 }

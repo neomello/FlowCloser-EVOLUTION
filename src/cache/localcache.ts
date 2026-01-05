@@ -11,7 +11,7 @@ export class LocalCache implements ICache {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly module: string,
+    private readonly module: string
   ) {
     this.conf = this.configService.get<CacheConf>('CACHE')?.LOCAL;
   }
@@ -21,7 +21,11 @@ export class LocalCache implements ICache {
   }
 
   async set(key: string, value: any, ttl?: number) {
-    return LocalCache.localCache.set(this.buildKey(key), value, ttl || this.conf.TTL);
+    return LocalCache.localCache.set(
+      this.buildKey(key),
+      value,
+      ttl || this.conf.TTL
+    );
   }
 
   async has(key: string) {
@@ -44,7 +48,9 @@ export class LocalCache implements ICache {
   async keys(appendCriteria?: string) {
     const filter = `${this.buildKey('')}${appendCriteria ? `${appendCriteria}:` : ''}`;
 
-    return LocalCache.localCache.keys().filter((key) => key.substring(0, filter.length) === filter);
+    return LocalCache.localCache
+      .keys()
+      .filter((key) => key.substring(0, filter.length) === filter);
   }
 
   buildKey(key: string) {

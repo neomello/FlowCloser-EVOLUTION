@@ -25,7 +25,8 @@ export class LabelRouter extends RouterBroker {
           request: req,
           schema: handleLabelSchema,
           ClassRef: HandleLabelDto,
-          execute: (instance, data) => labelController.handleLabel(instance, data),
+          execute: (instance, data) =>
+            labelController.handleLabel(instance, data),
         });
 
         return res.status(HttpStatus.OK).json(response);

@@ -54,24 +54,30 @@ export class InstanceRouter extends RouterBroker {
 
         return res.status(HttpStatus.OK).json(response);
       })
-      .get(this.routerPath('fetchInstances', false), ...guards, async (req, res) => {
-        const key = req.get('apikey');
+      .get(
+        this.routerPath('fetchInstances', false),
+        ...guards,
+        async (req, res) => {
+          const key = req.get('apikey');
 
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: null,
-          ClassRef: InstanceDto,
-          execute: (instance) => instanceController.fetchInstances(instance, key),
-        });
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: null,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              instanceController.fetchInstances(instance, key),
+          });
 
-        return res.status(HttpStatus.OK).json(response);
-      })
+          return res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('setPresence'), ...guards, async (req, res) => {
         const response = await this.dataValidate<null>({
           request: req,
           schema: presenceOnlySchema,
           ClassRef: SetPresenceDto,
-          execute: (instance, data) => instanceController.setPresence(instance, data),
+          execute: (instance, data) =>
+            instanceController.setPresence(instance, data),
         });
 
         return res.status(HttpStatus.CREATED).json(response);

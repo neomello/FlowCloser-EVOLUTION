@@ -6,16 +6,18 @@ function normalizeString(str: string): string {
 }
 
 export function advancedOperatorsSearch(data: string, query: string): boolean {
-  const filters = query.split(' ').reduce((acc: Record<string, string[]>, filter) => {
-    const [operator, ...values] = filter.split(':');
-    const value = values.join(':');
+  const filters = query
+    .split(' ')
+    .reduce((acc: Record<string, string[]>, filter) => {
+      const [operator, ...values] = filter.split(':');
+      const value = values.join(':');
 
-    if (!acc[operator]) {
-      acc[operator] = [];
-    }
-    acc[operator].push(value);
-    return acc;
-  }, {});
+      if (!acc[operator]) {
+        acc[operator] = [];
+      }
+      acc[operator].push(value);
+      return acc;
+    }, {});
 
   const normalizedItem = normalizeString(data);
 

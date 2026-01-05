@@ -50,4 +50,3 @@ jobs:
           else
             echo "✅ .env.example file exists"
           fi
-

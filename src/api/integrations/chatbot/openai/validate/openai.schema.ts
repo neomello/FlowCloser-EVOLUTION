@@ -8,7 +8,7 @@ const isNotEmpty = (...propertyNames: string[]): JSONSchema7 => {
       (properties[property] = {
         minLength: 1,
         description: `The "${property}" cannot be empty`,
-      }),
+      })
   );
   return {
     if: {
@@ -35,8 +35,14 @@ export const openaiSchema: JSONSchema7 = {
     assistantMessages: { type: 'array', items: { type: 'string' } },
     userMessages: { type: 'array', items: { type: 'string' } },
     maxTokens: { type: 'integer' },
-    triggerType: { type: 'string', enum: ['all', 'keyword', 'none', 'advanced'] },
-    triggerOperator: { type: 'string', enum: ['equals', 'contains', 'startsWith', 'endsWith', 'regex'] },
+    triggerType: {
+      type: 'string',
+      enum: ['all', 'keyword', 'none', 'advanced'],
+    },
+    triggerOperator: {
+      type: 'string',
+      enum: ['equals', 'contains', 'startsWith', 'endsWith', 'regex'],
+    },
     triggerValue: { type: 'string' },
     expire: { type: 'integer' },
     keywordFinish: { type: 'string' },
@@ -113,7 +119,7 @@ export const openaiSettingSchema: JSONSchema7 = {
     'stopBotFromMe',
     'keepOpen',
     'debounceTime',
-    'ignoreJids',
+    'ignoreJids'
   ),
 };
 

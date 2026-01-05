@@ -14,7 +14,7 @@ export class N8nService extends BaseChatbotService<N8n, N8nSetting> {
     waMonitor: WAMonitoringService,
     prismaRepository: PrismaRepository,
     configService: ConfigService,
-    openaiService: OpenaiService,
+    openaiService: OpenaiService
   ) {
     super(waMonitor, prismaRepository, 'N8nService', configService);
     this.openaiService = openaiService;
@@ -35,7 +35,7 @@ export class N8nService extends BaseChatbotService<N8n, N8nSetting> {
     remoteJid: string,
     pushName: string,
     content: string,
-    msg?: any,
+    msg?: any
   ) {
     try {
       if (!session) {
@@ -60,8 +60,13 @@ export class N8nService extends BaseChatbotService<N8n, N8nSetting> {
       // Handle audio messages
       if (this.isAudioMessage(content) && msg) {
         try {
-          this.logger.debug(`[N8n] Downloading audio for Whisper transcription`);
-          const transcription = await this.openaiService.speechToText(msg, instance);
+          this.logger.debug(
+            `[N8n] Downloading audio for Whisper transcription`
+          );
+          const transcription = await this.openaiService.speechToText(
+            msg,
+            instance
+          );
           if (transcription) {
             payload.chatInput = `[audio] ${transcription}`;
           }
@@ -72,14 +77,22 @@ export class N8nService extends BaseChatbotService<N8n, N8nSetting> {
 
       const headers: Record<string, string> = {};
       if (n8n.basicAuthUser && n8n.basicAuthPass) {
-        const auth = Buffer.from(`${n8n.basicAuthUser}:${n8n.basicAuthPass}`).toString('base64');
+        const auth = Buffer.from(
+          `${n8n.basicAuthUser}:${n8n.basicAuthPass}`
+        ).toString('base64');
         headers['Authorization'] = `Basic ${auth}`;
       }
       const response = await axios.post(endpoint, payload, { headers });
       const message = response?.data?.output || response?.data?.answer;
 
       // Use base class method instead of custom implementation
-      await this.sendMessageWhatsApp(instance, remoteJid, message, settings, true);
+      await this.sendMessageWhatsApp(
+        instance,
+        remoteJid,
+        message,
+        settings,
+        true
+      );
 
       await this.prismaRepository.integrationSession.update({
         where: {

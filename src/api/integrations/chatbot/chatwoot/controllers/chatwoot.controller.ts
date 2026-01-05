@@ -8,11 +8,12 @@ import { isURL } from 'class-validator';
 export class ChatwootController {
   constructor(
     private readonly chatwootService: ChatwootService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   public async createChatwoot(instance: InstanceDto, data: ChatwootDto) {
-    if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED) throw new BadRequestException('Chatwoot is disabled');
+    if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED)
+      throw new BadRequestException('Chatwoot is disabled');
 
     if (data?.enabled) {
       if (!isURL(data.url, { require_tld: false })) {
@@ -49,8 +50,11 @@ export class ChatwootController {
     return response;
   }
 
-  public async findChatwoot(instance: InstanceDto): Promise<ChatwootDto & { webhook_url: string }> {
-    if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED) throw new BadRequestException('Chatwoot is disabled');
+  public async findChatwoot(
+    instance: InstanceDto
+  ): Promise<ChatwootDto & { webhook_url: string }> {
+    if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED)
+      throw new BadRequestException('Chatwoot is disabled');
 
     const result = await this.chatwootService.find(instance);
 
@@ -77,7 +81,8 @@ export class ChatwootController {
   }
 
   public async receiveWebhook(instance: InstanceDto, data: any) {
-    if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED) throw new BadRequestException('Chatwoot is disabled');
+    if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED)
+      throw new BadRequestException('Chatwoot is disabled');
 
     return this.chatwootService.receiveWebhook(instance, data);
   }

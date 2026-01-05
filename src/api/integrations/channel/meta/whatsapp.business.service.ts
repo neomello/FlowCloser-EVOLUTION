@@ -19,7 +19,14 @@ import { chatbotController } from '@api/server.module';
 import { CacheService } from '@api/services/cache.service';
 import { ChannelStartupService } from '@api/services/channel.service';
 import { Events, wa } from '@api/types/wa.types';
-import { AudioConverter, Chatwoot, ConfigService, Database, Openai, WaBusiness } from '@config/env.config';
+import {
+  AudioConverter,
+  Chatwoot,
+  ConfigService,
+  Database,
+  Openai,
+  WaBusiness,
+} from '@config/env.config';
 import { BadRequestException, InternalServerErrorException } from '@exceptions';
 import { createJid } from '@utils/createJid';
 import { status } from '@utils/renderStatus';
@@ -38,7 +45,7 @@ export class BusinessStartupService extends ChannelStartupService {
     public readonly cache: CacheService,
     public readonly chatwootCache: CacheService,
     public readonly baileysCache: CacheService,
-    private readonly providerFiles: ProviderFiles,
+    private readonly providerFiles: ProviderFiles
   ) {
     super(configService, eventEmitter, prismaRepository, chatwootCache);
   }
@@ -78,7 +85,10 @@ export class BusinessStartupService extends ChannelStartupService {
       let urlServer = this.configService.get<WaBusiness>('WA_BUSINESS').URL;
       const version = this.configService.get<WaBusiness>('WA_BUSINESS').VERSION;
       urlServer = `${urlServer}/${version}/${this.number}/${params}`;
-      const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}` };
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      };
       const result = await axios.post(urlServer, message, { headers });
       return result.data;
     } catch (e) {
@@ -131,7 +141,11 @@ export class BusinessStartupService extends ChannelStartupService {
 
       this.eventHandler(content);
 
-      this.phoneNumber = createJid(content.messages ? content.messages[0].from : content.statuses[0]?.recipient_id);
+      this.phoneNumber = createJid(
+        content.messages
+          ? content.messages[0].from
+          : content.statuses[0]?.recipient_id
+      );
     } catch (error) {
       this.logger.error(error);
       throw new InternalServerErrorException(error?.toString());
@@ -144,7 +158,10 @@ export class BusinessStartupService extends ChannelStartupService {
       let urlServer = this.configService.get<WaBusiness>('WA_BUSINESS').URL;
       const version = this.configService.get<WaBusiness>('WA_BUSINESS').VERSION;
       urlServer = `${urlServer}/${version}/${id}`;
-      const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}` };
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      };
 
       // Primeiro, obtenha a URL do arquivo
       let result = await axios.get(urlServer, { headers });
@@ -188,15 +205,27 @@ export class BusinessStartupService extends ChannelStartupService {
 
   private messageInteractiveJson(received: any) {
     const message = received.messages[0];
-    let content: any = { conversation: message.interactive[message.interactive.type].title };
-    message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
+    let content: any = {
+      conversation: message.interactive[message.interactive.type].title,
+    };
+    message.context
+      ? (content = {
+          ...content,
+          contextInfo: { stanzaId: message.context.id },
+        })
+      : content;
     return content;
   }
 
   private messageButtonJson(received: any) {
     const message = received.messages[0];
     let content: any = { conversation: received.messages[0].button?.text };
-    message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
+    message.context
+      ? (content = {
+          ...content,
+          contextInfo: { stanzaId: message.context.id },
+        })
+      : content;
     return content;
   }
 
@@ -210,14 +239,21 @@ export class BusinessStartupService extends ChannelStartupService {
         text: message.reaction.emoji,
       },
     };
-    message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
+    message.context
+      ? (content = {
+          ...content,
+          contextInfo: { stanzaId: message.context.id },
+        })
+      : content;
     return content;
   }
 
   private messageTextJson(received: any) {
     // Verificar que received y received.messages existen
     if (!received || !received.messages || received.messages.length === 0) {
-      this.logger.error('Error: received object or messages array is undefined or empty');
+      this.logger.error(
+        'Error: received object or messages array is undefined or empty'
+      );
       return null;
     }
 
@@ -285,7 +321,12 @@ export class BusinessStartupService extends ChannelStartupService {
         address: message.location?.address,
       },
     };
-    message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
+    message.context
+      ? (content = {
+          ...content,
+          contextInfo: { stanzaId: message.context.id },
+        })
+      : content;
     return content;
   }
 
@@ -340,7 +381,12 @@ export class BusinessStartupService extends ChannelStartupService {
         }),
       };
     }
-    message.context ? (content = { ...content, contextInfo: { stanzaId: message.context.id } }) : content;
+    message.context
+      ? (content = {
+          ...content,
+          contextInfo: { stanzaId: message.context.id },
+        })
+      : content;
     return content;
   }
 
@@ -380,7 +426,11 @@ export class BusinessStartupService extends ChannelStartupService {
     return messageType;
   }
 
-  protected async messageHandle(received: any, database: Database, settings: any) {
+  protected async messageHandle(
+    received: any,
+    database: Database,
+    settings: any
+  ) {
     try {
       let messageRaw: any;
       let pushName: any;
@@ -411,7 +461,9 @@ export class BusinessStartupService extends ChannelStartupService {
           };
         } else if (this.isMediaMessage(message)) {
           const messageContent =
-            message.type === 'audio' ? this.messageAudioJson(received) : this.messageMediaJson(received);
+            message.type === 'audio'
+              ? this.messageAudioJson(received)
+              : this.messageMediaJson(received);
 
           messageRaw = {
             key,
@@ -419,35 +471,49 @@ export class BusinessStartupService extends ChannelStartupService {
             message: messageContent,
             contextInfo: messageContent?.contextInfo,
             messageType: this.renderMessageType(received.messages[0].type),
-            messageTimestamp: parseInt(received.messages[0].timestamp) as number,
+            messageTimestamp: parseInt(
+              received.messages[0].timestamp
+            ) as number,
             source: 'unknown',
             instanceId: this.instanceId,
           };
 
           // S3 storage integration removed
           if (this.localWebhook.enabled && this.localWebhook.webhookBase64) {
-            const buffer = await this.downloadMediaMessage(received?.messages[0]);
+            const buffer = await this.downloadMediaMessage(
+              received?.messages[0]
+            );
             messageRaw.message.base64 = buffer.toString('base64');
           }
 
           // Processar OpenAI speech-to-text para áudio
-          if (this.configService.get<Openai>('OPENAI').ENABLED && message.type === 'audio') {
+          if (
+            this.configService.get<Openai>('OPENAI').ENABLED &&
+            message.type === 'audio'
+          ) {
             let openAiBase64 = messageRaw.message.base64;
             if (!openAiBase64) {
-              const buffer = await this.downloadMediaMessage(received?.messages[0]);
+              const buffer = await this.downloadMediaMessage(
+                received?.messages[0]
+              );
               openAiBase64 = buffer.toString('base64');
             }
 
-            const openAiDefaultSettings = await this.prismaRepository.openaiSetting.findFirst({
-              where: {
-                instanceId: this.instanceId,
-              },
-              include: {
-                OpenaiCreds: true,
-              },
-            });
+            const openAiDefaultSettings =
+              await this.prismaRepository.openaiSetting.findFirst({
+                where: {
+                  instanceId: this.instanceId,
+                },
+                include: {
+                  OpenaiCreds: true,
+                },
+              });
 
-            if (openAiDefaultSettings && openAiDefaultSettings.openaiCredsId && openAiDefaultSettings.speechToText) {
+            if (
+              openAiDefaultSettings &&
+              openAiDefaultSettings.openaiCredsId &&
+              openAiDefaultSettings.speechToText
+            ) {
               try {
                 messageRaw.message.speechToText = `[audio] ${await this.openaiService.speechToText(
                   openAiDefaultSettings.OpenaiCreds,
@@ -456,10 +522,12 @@ export class BusinessStartupService extends ChannelStartupService {
                       base64: openAiBase64,
                       ...messageRaw,
                     },
-                  },
+                  }
                 )}`;
               } catch (speechError) {
-                this.logger.error(`Error processing speech-to-text: ${speechError}`);
+                this.logger.error(
+                  `Error processing speech-to-text: ${speechError}`
+                );
               }
             }
           }
@@ -472,7 +540,9 @@ export class BusinessStartupService extends ChannelStartupService {
             },
             contextInfo: this.messageInteractiveJson(received)?.contextInfo,
             messageType: 'interactiveMessage',
-            messageTimestamp: parseInt(received.messages[0].timestamp) as number,
+            messageTimestamp: parseInt(
+              received.messages[0].timestamp
+            ) as number,
             source: 'unknown',
             instanceId: this.instanceId,
           };
@@ -485,7 +555,9 @@ export class BusinessStartupService extends ChannelStartupService {
             },
             contextInfo: this.messageButtonJson(received)?.contextInfo,
             messageType: 'buttonMessage',
-            messageTimestamp: parseInt(received.messages[0].timestamp) as number,
+            messageTimestamp: parseInt(
+              received.messages[0].timestamp
+            ) as number,
             source: 'unknown',
             instanceId: this.instanceId,
           };
@@ -498,7 +570,9 @@ export class BusinessStartupService extends ChannelStartupService {
             },
             contextInfo: this.messageReactionJson(received)?.contextInfo,
             messageType: 'reactionMessage',
-            messageTimestamp: parseInt(received.messages[0].timestamp) as number,
+            messageTimestamp: parseInt(
+              received.messages[0].timestamp
+            ) as number,
             source: 'unknown',
             instanceId: this.instanceId,
           };
@@ -511,7 +585,9 @@ export class BusinessStartupService extends ChannelStartupService {
             },
             contextInfo: this.messageContactsJson(received)?.contextInfo,
             messageType: 'contactMessage',
-            messageTimestamp: parseInt(received.messages[0].timestamp) as number,
+            messageTimestamp: parseInt(
+              received.messages[0].timestamp
+            ) as number,
             source: 'unknown',
             instanceId: this.instanceId,
           };
@@ -522,7 +598,9 @@ export class BusinessStartupService extends ChannelStartupService {
             message: this.messageTextJson(received),
             contextInfo: this.messageTextJson(received)?.contextInfo,
             messageType: this.renderMessageType(received.messages[0].type),
-            messageTimestamp: parseInt(received.messages[0].timestamp) as number,
+            messageTimestamp: parseInt(
+              received.messages[0].timestamp
+            ) as number,
             source: 'unknown',
             instanceId: this.instanceId,
           };
@@ -534,22 +612,30 @@ export class BusinessStartupService extends ChannelStartupService {
 
         this.logger.log(messageRaw);
 
-        sendTelemetry(`received.message.${messageRaw.messageType ?? 'unknown'}`);
+        sendTelemetry(
+          `received.message.${messageRaw.messageType ?? 'unknown'}`
+        );
 
         this.sendDataWebhook(Events.MESSAGES_UPSERT, messageRaw);
 
         await chatbotController.emit({
-          instance: { instanceName: this.instance.name, instanceId: this.instanceId },
+          instance: {
+            instanceName: this.instance.name,
+            instanceId: this.instanceId,
+          },
           remoteJid: messageRaw.key.remoteJid,
           msg: messageRaw,
           pushName: messageRaw.pushName,
         });
 
-        if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
+        if (
+          this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+          this.localChatwoot?.enabled
+        ) {
           const chatwootSentMessage = await this.chatwootService.eventWhatsapp(
             Events.MESSAGES_UPSERT,
             { instanceName: this.instance.name, instanceId: this.instanceId },
-            messageRaw,
+            messageRaw
           );
 
           if (chatwootSentMessage?.id) {
@@ -590,11 +676,14 @@ export class BusinessStartupService extends ChannelStartupService {
 
           this.sendDataWebhook(Events.CONTACTS_UPDATE, contactRaw);
 
-          if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
+          if (
+            this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+            this.localChatwoot?.enabled
+          ) {
             await this.chatwootService.eventWhatsapp(
               Events.CONTACTS_UPDATE,
               { instanceName: this.instance.name, instanceId: this.instanceId },
-              contactRaw,
+              contactRaw
             );
           }
 
@@ -621,7 +710,10 @@ export class BusinessStartupService extends ChannelStartupService {
           if (settings?.groups_ignore && key.remoteJid.includes('@g.us')) {
             return;
           }
-          if (key.remoteJid !== 'status@broadcast' && !key?.remoteJid?.match(/(:\d+)/)) {
+          if (
+            key.remoteJid !== 'status@broadcast' &&
+            !key?.remoteJid?.match(/(:\d+)/)
+          ) {
             const findMessage = await this.prismaRepository.message.findFirst({
               where: {
                 instanceId: this.instanceId,
@@ -653,11 +745,17 @@ export class BusinessStartupService extends ChannelStartupService {
                 data: message,
               });
 
-              if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
+              if (
+                this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+                this.localChatwoot?.enabled
+              ) {
                 this.chatwootService.eventWhatsapp(
                   Events.MESSAGES_DELETE,
-                  { instanceName: this.instance.name, instanceId: this.instanceId },
-                  { key: key },
+                  {
+                    instanceName: this.instance.name,
+                    instanceId: this.instanceId,
+                  },
+                  { key: key }
                 );
               }
 
@@ -798,7 +896,9 @@ export class BusinessStartupService extends ChannelStartupService {
         // Procesar actualizaciones de estado
         this.messageHandle(content, database, settings);
       } else {
-        this.logger.warn('No se encontraron mensajes ni estados en el contenido recibido');
+        this.logger.warn(
+          'No se encontraron mensajes ni estados en el contenido recibido'
+        );
       }
     } catch (error) {
       this.logger.error('Error en eventHandler:');
@@ -806,7 +906,12 @@ export class BusinessStartupService extends ChannelStartupService {
     }
   }
 
-  protected async sendMessageWithTyping(number: string, message: any, options?: Options, isIntegration = false) {
+  protected async sendMessageWithTyping(
+    number: string,
+    message: any,
+    options?: Options,
+    isIntegration = false
+  ) {
     try {
       let quoted: any;
       let webhookUrl: any;
@@ -897,7 +1002,8 @@ export class BusinessStartupService extends ChannelStartupService {
                 message['mediaType'] !== 'video' &&
                 message['fileName'] &&
                 !isImage && { filename: message['fileName'] }),
-              ...(message['mediaType'] !== 'audio' && message['caption'] && { caption: message['caption'] }),
+              ...(message['mediaType'] !== 'audio' &&
+                message['caption'] && { caption: message['caption'] }),
             },
           };
           quoted ? (content.context = { message_id: quoted.id }) : content;
@@ -937,7 +1043,9 @@ export class BusinessStartupService extends ChannelStartupService {
           for (const item of message['buttons']) {
             formattedText += `▶️ ${item.reply?.title}\n`;
           }
-          message = { conversation: `${message['text'] || 'Select'}\n` + formattedText };
+          message = {
+            conversation: `${message['text'] || 'Select'}\n` + formattedText,
+          };
           return await this.post(content, 'messages');
         }
         if (message['listMessage']) {
@@ -972,7 +1080,10 @@ export class BusinessStartupService extends ChannelStartupService {
               formattedText += `${row?.title}\n`;
             }
           }
-          message = { conversation: `${message['listMessage']['title']}\n` + formattedText };
+          message = {
+            conversation:
+              `${message['listMessage']['title']}\n` + formattedText,
+          };
           return await this.post(content, 'messages');
         }
         if (message['template']) {
@@ -1001,10 +1112,16 @@ export class BusinessStartupService extends ChannelStartupService {
       }
 
       const messageRaw: any = {
-        key: { fromMe: true, id: messageSent?.messages[0]?.id, remoteJid: createJid(number) },
+        key: {
+          fromMe: true,
+          id: messageSent?.messages[0]?.id,
+          remoteJid: createJid(number),
+        },
         message: this.convertMessageToRaw(message, content),
         messageType: this.renderMessageType(content.type),
-        messageTimestamp: (messageSent?.messages[0]?.timestamp as number) || Math.round(new Date().getTime() / 1000),
+        messageTimestamp:
+          (messageSent?.messages[0]?.timestamp as number) ||
+          Math.round(new Date().getTime() / 1000),
         instanceId: this.instanceId,
         webhookUrl,
         status: status[1],
@@ -1015,17 +1132,28 @@ export class BusinessStartupService extends ChannelStartupService {
 
       this.sendDataWebhook(Events.SEND_MESSAGE, messageRaw);
 
-      if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled && !isIntegration) {
+      if (
+        this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+        this.localChatwoot?.enabled &&
+        !isIntegration
+      ) {
         this.chatwootService.eventWhatsapp(
           Events.SEND_MESSAGE,
           { instanceName: this.instance.name, instanceId: this.instanceId },
-          messageRaw,
+          messageRaw
         );
       }
 
-      if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled && isIntegration)
+      if (
+        this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+        this.localChatwoot?.enabled &&
+        isIntegration
+      )
         await chatbotController.emit({
-          instance: { instanceName: this.instance.name, instanceId: this.instanceId },
+          instance: {
+            instanceName: this.instance.name,
+            instanceId: this.instanceId,
+          },
           remoteJid: messageRaw.key.remoteJid,
           msg: messageRaw,
           pushName: messageRaw.pushName,
@@ -1057,7 +1185,7 @@ export class BusinessStartupService extends ChannelStartupService {
         mentionsEveryOne: data?.mentionsEveryOne,
         mentioned: data?.mentioned,
       },
-      isIntegration,
+      isIntegration
     );
     return res;
   }
@@ -1068,7 +1196,9 @@ export class BusinessStartupService extends ChannelStartupService {
 
       if (isFile === false) {
         if (isURL(mediaMessage.media)) {
-          const response = await axios.get(mediaMessage.media, { responseType: 'arraybuffer' });
+          const response = await axios.get(mediaMessage.media, {
+            responseType: 'arraybuffer',
+          });
           const buffer = Buffer.from(response.data, 'base64');
           formData.append('file', buffer, {
             filename: mediaMessage.fileName || 'media',
@@ -1154,7 +1284,11 @@ export class BusinessStartupService extends ChannelStartupService {
     }
   }
 
-  public async mediaMessage(data: SendMediaDto, file?: any, isIntegration = false) {
+  public async mediaMessage(
+    data: SendMediaDto,
+    file?: any,
+    isIntegration = false
+  ) {
     const mediaData: SendMediaDto = { ...data };
 
     if (file) mediaData.media = file.buffer.toString('base64');
@@ -1172,7 +1306,7 @@ export class BusinessStartupService extends ChannelStartupService {
         mentionsEveryOne: data?.mentionsEveryOne,
         mentioned: data?.mentioned,
       },
-      isIntegration,
+      isIntegration
     );
 
     return mediaSent;
@@ -1182,7 +1316,8 @@ export class BusinessStartupService extends ChannelStartupService {
     number = number.replace(/\D/g, '');
     const hash = `${number}-${new Date().getTime()}`;
 
-    const audioConverterConfig = this.configService.get<AudioConverter>('AUDIO_CONVERTER');
+    const audioConverterConfig =
+      this.configService.get<AudioConverter>('AUDIO_CONVERTER');
     if (audioConverterConfig.API_URL) {
       this.logger.verbose('Using audio converter API');
       const formData = new FormData();
@@ -1200,12 +1335,16 @@ export class BusinessStartupService extends ChannelStartupService {
 
       formData.append('format', 'mp3');
 
-      const response = await axios.post(audioConverterConfig.API_URL, formData, {
-        headers: {
-          ...formData.getHeaders(),
-          apikey: audioConverterConfig.API_KEY,
-        },
-      });
+      const response = await axios.post(
+        audioConverterConfig.API_URL,
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+            apikey: audioConverterConfig.API_KEY,
+          },
+        }
+      );
 
       const audioConverter = response?.data?.audio || response?.data?.url;
 
@@ -1258,7 +1397,11 @@ export class BusinessStartupService extends ChannelStartupService {
     }
   }
 
-  public async audioWhatsapp(data: SendAudioDto, file?: any, isIntegration = false) {
+  public async audioWhatsapp(
+    data: SendAudioDto,
+    file?: any,
+    isIntegration = false
+  ) {
     const message = await this.processAudio(data.audio, data.number, file);
 
     const audioSent = await this.sendMessageWithTyping(
@@ -1272,7 +1415,7 @@ export class BusinessStartupService extends ChannelStartupService {
         mentionsEveryOne: data?.mentionsEveryOne,
         mentioned: data?.mentioned,
       },
-      isIntegration,
+      isIntegration
     );
 
     return audioSent;
@@ -1287,7 +1430,10 @@ export class BusinessStartupService extends ChannelStartupService {
     };
 
     if (!arrayUnique(btnItems.text) || !arrayUnique(btnItems.ids)) {
-      throw new BadRequestException('Button texts cannot be repeated', 'Button IDs cannot be repeated.');
+      throw new BadRequestException(
+        'Button texts cannot be repeated',
+        'Button IDs cannot be repeated.'
+      );
     }
 
     return await this.sendMessageWithTyping(
@@ -1312,7 +1458,7 @@ export class BusinessStartupService extends ChannelStartupService {
         linkPreview: data?.linkPreview,
         mentionsEveryOne: data?.mentionsEveryOne,
         mentioned: data?.mentioned,
-      },
+      }
     );
   }
 
@@ -1334,7 +1480,7 @@ export class BusinessStartupService extends ChannelStartupService {
         linkPreview: data?.linkPreview,
         mentionsEveryOne: data?.mentionsEveryOne,
         mentioned: data?.mentioned,
-      },
+      }
     );
   }
 
@@ -1397,7 +1543,7 @@ export class BusinessStartupService extends ChannelStartupService {
         mentioned: data?.mentioned,
         webhookUrl: data?.webhookUrl,
       },
-      isIntegration,
+      isIntegration
     );
     return res;
   }
@@ -1406,7 +1552,11 @@ export class BusinessStartupService extends ChannelStartupService {
     const message: any = {};
 
     const vcard = (contact: ContactMessage) => {
-      let result = 'BEGIN:VCARD\n' + 'VERSION:3.0\n' + `N:${contact.fullName}\n` + `FN:${contact.fullName}\n`;
+      let result =
+        'BEGIN:VCARD\n' +
+        'VERSION:3.0\n' +
+        `N:${contact.fullName}\n` +
+        `FN:${contact.fullName}\n`;
 
       if (contact.organization) {
         result += `ORG:${contact.organization};\n`;
@@ -1424,7 +1574,10 @@ export class BusinessStartupService extends ChannelStartupService {
         contact.wuid = createJid(contact.phoneNumber);
       }
 
-      result += `item1.TEL;waid=${contact.wuid}:${contact.phoneNumber}\n` + 'item1.X-ABLabel:Celular\n' + 'END:VCARD';
+      result +=
+        `item1.TEL;waid=${contact.wuid}:${contact.phoneNumber}\n` +
+        'item1.X-ABLabel:Celular\n' +
+        'END:VCARD';
 
       return result;
     };
@@ -1450,7 +1603,10 @@ export class BusinessStartupService extends ChannelStartupService {
       {
         contacts: data.contact.map((contact) => {
           return {
-            name: { formatted_name: contact.fullName, first_name: contact.fullName },
+            name: {
+              formatted_name: contact.fullName,
+              first_name: contact.fullName,
+            },
             phones: [{ phone: contact.phoneNumber }],
             urls: [{ url: contact.url }],
             emails: [{ email: contact.email }],
@@ -1466,7 +1622,7 @@ export class BusinessStartupService extends ChannelStartupService {
         linkPreview: data?.linkPreview,
         mentionsEveryOne: data?.mentionsEveryOne,
         mentioned: data?.mentioned,
-      },
+      }
     );
   }
 
@@ -1482,11 +1638,16 @@ export class BusinessStartupService extends ChannelStartupService {
   public async getBase64FromMediaMessage(data: any) {
     try {
       const msg = data.message;
-      const messageType = msg.messageType.includes('Message') ? msg.messageType : msg.messageType + 'Message';
+      const messageType = msg.messageType.includes('Message')
+        ? msg.messageType
+        : msg.messageType + 'Message';
       const mediaMessage = msg.message[messageType];
 
       if (!msg.message?.base64) {
-        const buffer = await this.downloadMediaMessage({ type: messageType, ...msg.message });
+        const buffer = await this.downloadMediaMessage({
+          type: messageType,
+          ...msg.message,
+        });
         msg.message.base64 = buffer.toString('base64');
       }
 
@@ -1509,131 +1670,215 @@ export class BusinessStartupService extends ChannelStartupService {
   }
 
   public async deleteMessage() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
 
   // methods not available on WhatsApp Business API
   public async mediaSticker() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async pollMessage() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async statusMessage() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async reloadConnection() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async whatsappNumber() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async markMessageAsRead() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async archiveChat() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async markChatUnread() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async fetchProfile() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async offerCall() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async sendPresence() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async setPresence() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async fetchPrivacySettings() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updatePrivacySettings() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async fetchBusinessProfile() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateProfileName() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateProfileStatus() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateProfilePicture() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async removeProfilePicture() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async blockUser() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateMessage() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async createGroup() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateGroupPicture() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateGroupSubject() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateGroupDescription() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async findGroup() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async fetchAllGroups() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async inviteCode() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async inviteInfo() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async sendInvite() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async acceptInviteCode() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async revokeInviteCode() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async findParticipants() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateGParticipant() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async updateGSetting() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async toggleEphemeral() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async leaveGroup() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async fetchLabels() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async handleLabel() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async receiveMobileCode() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async fakeCall() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
 }

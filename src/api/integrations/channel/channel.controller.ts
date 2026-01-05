@@ -30,7 +30,10 @@ export class ChannelController {
   public prismaRepository: PrismaRepository;
   public waMonitor: WAMonitoringService;
 
-  constructor(prismaRepository: PrismaRepository, waMonitor: WAMonitoringService) {
+  constructor(
+    prismaRepository: PrismaRepository,
+    waMonitor: WAMonitoringService
+  ) {
     this.prisma = prismaRepository;
     this.monitor = waMonitor;
   }
@@ -52,7 +55,10 @@ export class ChannelController {
   }
 
   public init(instanceData: InstanceDto, data: ChannelDataType) {
-    if (!instanceData.token && instanceData.integration === Integration.WHATSAPP_BUSINESS) {
+    if (
+      !instanceData.token &&
+      instanceData.integration === Integration.WHATSAPP_BUSINESS
+    ) {
       throw new BadRequestException('token is required');
     }
 
@@ -64,7 +70,7 @@ export class ChannelController {
         data.cache,
         data.chatwootCache,
         data.baileysCache,
-        data.providerFiles,
+        data.providerFiles
       );
     }
 
@@ -74,7 +80,7 @@ export class ChannelController {
         data.eventEmitter,
         data.prismaRepository,
         data.cache,
-        data.chatwootCache,
+        data.chatwootCache
       );
     }
 
@@ -86,7 +92,7 @@ export class ChannelController {
         data.cache,
         data.chatwootCache,
         data.baileysCache,
-        data.providerFiles,
+        data.providerFiles
       );
     }
 

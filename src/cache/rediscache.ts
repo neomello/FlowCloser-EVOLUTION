@@ -13,7 +13,7 @@ export class RedisCache implements ICache {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly module: string,
+    private readonly module: string
   ) {
     this.conf = this.configService.get<CacheConf>('CACHE')?.REDIS;
     this.client = redisClient.getConnection();
@@ -42,7 +42,11 @@ export class RedisCache implements ICache {
 
   async set(key: string, value: any, ttl?: number) {
     try {
-      await this.client.setEx(this.buildKey(key), ttl || this.conf?.TTL, JSON.stringify(value));
+      await this.client.setEx(
+        this.buildKey(key),
+        ttl || this.conf?.TTL,
+        JSON.stringify(value)
+      );
     } catch (error) {
       this.logger.error(error);
     }

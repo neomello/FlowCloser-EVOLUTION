@@ -41,47 +41,64 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: createGroupSchema,
           ClassRef: CreateGroupDto,
-          execute: (instance, data) => groupController.createGroup(instance, data),
+          execute: (instance, data) =>
+            groupController.createGroup(instance, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);
       })
-      .post(this.routerPath('updateGroupSubject'), ...guards, async (req, res) => {
-        const response = await this.groupValidate<GroupSubjectDto>({
-          request: req,
-          schema: updateGroupSubjectSchema,
-          ClassRef: GroupSubjectDto,
-          execute: (instance, data) => groupController.updateGroupSubject(instance, data),
-        });
+      .post(
+        this.routerPath('updateGroupSubject'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.groupValidate<GroupSubjectDto>({
+            request: req,
+            schema: updateGroupSubjectSchema,
+            ClassRef: GroupSubjectDto,
+            execute: (instance, data) =>
+              groupController.updateGroupSubject(instance, data),
+          });
 
-        res.status(HttpStatus.CREATED).json(response);
-      })
-      .post(this.routerPath('updateGroupPicture'), ...guards, async (req, res) => {
-        const response = await this.groupValidate<GroupPictureDto>({
-          request: req,
-          schema: updateGroupPictureSchema,
-          ClassRef: GroupPictureDto,
-          execute: (instance, data) => groupController.updateGroupPicture(instance, data),
-        });
+          res.status(HttpStatus.CREATED).json(response);
+        }
+      )
+      .post(
+        this.routerPath('updateGroupPicture'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.groupValidate<GroupPictureDto>({
+            request: req,
+            schema: updateGroupPictureSchema,
+            ClassRef: GroupPictureDto,
+            execute: (instance, data) =>
+              groupController.updateGroupPicture(instance, data),
+          });
 
-        res.status(HttpStatus.CREATED).json(response);
-      })
-      .post(this.routerPath('updateGroupDescription'), ...guards, async (req, res) => {
-        const response = await this.groupValidate<GroupDescriptionDto>({
-          request: req,
-          schema: updateGroupDescriptionSchema,
-          ClassRef: GroupDescriptionDto,
-          execute: (instance, data) => groupController.updateGroupDescription(instance, data),
-        });
+          res.status(HttpStatus.CREATED).json(response);
+        }
+      )
+      .post(
+        this.routerPath('updateGroupDescription'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.groupValidate<GroupDescriptionDto>({
+            request: req,
+            schema: updateGroupDescriptionSchema,
+            ClassRef: GroupDescriptionDto,
+            execute: (instance, data) =>
+              groupController.updateGroupDescription(instance, data),
+          });
 
-        res.status(HttpStatus.CREATED).json(response);
-      })
+          res.status(HttpStatus.CREATED).json(response);
+        }
+      )
       .get(this.routerPath('findGroupInfos'), ...guards, async (req, res) => {
         const response = await this.groupValidate<GroupJid>({
           request: req,
           schema: groupJidSchema,
           ClassRef: GroupJid,
-          execute: (instance, data) => groupController.findGroupInfo(instance, data),
+          execute: (instance, data) =>
+            groupController.findGroupInfo(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -91,7 +108,8 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: getParticipantsSchema,
           ClassRef: GetParticipant,
-          execute: (instance, data) => groupController.fetchAllGroups(instance, data),
+          execute: (instance, data) =>
+            groupController.fetchAllGroups(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -101,7 +119,8 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: groupJidSchema,
           ClassRef: GroupJid,
-          execute: (instance, data) => groupController.findParticipants(instance, data),
+          execute: (instance, data) =>
+            groupController.findParticipants(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -111,7 +130,8 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: groupJidSchema,
           ClassRef: GroupJid,
-          execute: (instance, data) => groupController.inviteCode(instance, data),
+          execute: (instance, data) =>
+            groupController.inviteCode(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -121,7 +141,8 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: groupInviteSchema,
           ClassRef: GroupInvite,
-          execute: (instance, data) => groupController.inviteInfo(instance, data),
+          execute: (instance, data) =>
+            groupController.inviteInfo(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -131,7 +152,8 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: AcceptGroupInviteSchema,
           ClassRef: AcceptGroupInvite,
-          execute: (instance, data) => groupController.acceptInviteCode(instance, data),
+          execute: (instance, data) =>
+            groupController.acceptInviteCode(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
@@ -141,37 +163,49 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: groupSendInviteSchema,
           ClassRef: GroupSendInvite,
-          execute: (instance, data) => groupController.sendInvite(instance, data),
+          execute: (instance, data) =>
+            groupController.sendInvite(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .post(this.routerPath('revokeInviteCode'), ...guards, async (req, res) => {
-        const response = await this.groupValidate<GroupJid>({
-          request: req,
-          schema: groupJidSchema,
-          ClassRef: GroupJid,
-          execute: (instance, data) => groupController.revokeInviteCode(instance, data),
-        });
+      .post(
+        this.routerPath('revokeInviteCode'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.groupValidate<GroupJid>({
+            request: req,
+            schema: groupJidSchema,
+            ClassRef: GroupJid,
+            execute: (instance, data) =>
+              groupController.revokeInviteCode(instance, data),
+          });
 
-        res.status(HttpStatus.CREATED).json(response);
-      })
-      .post(this.routerPath('updateParticipant'), ...guards, async (req, res) => {
-        const response = await this.groupValidate<GroupUpdateParticipantDto>({
-          request: req,
-          schema: updateParticipantsSchema,
-          ClassRef: GroupUpdateParticipantDto,
-          execute: (instance, data) => groupController.updateGParticipate(instance, data),
-        });
+          res.status(HttpStatus.CREATED).json(response);
+        }
+      )
+      .post(
+        this.routerPath('updateParticipant'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.groupValidate<GroupUpdateParticipantDto>({
+            request: req,
+            schema: updateParticipantsSchema,
+            ClassRef: GroupUpdateParticipantDto,
+            execute: (instance, data) =>
+              groupController.updateGParticipate(instance, data),
+          });
 
-        res.status(HttpStatus.CREATED).json(response);
-      })
+          res.status(HttpStatus.CREATED).json(response);
+        }
+      )
       .post(this.routerPath('updateSetting'), ...guards, async (req, res) => {
         const response = await this.groupValidate<GroupUpdateSettingDto>({
           request: req,
           schema: updateSettingsSchema,
           ClassRef: GroupUpdateSettingDto,
-          execute: (instance, data) => groupController.updateGSetting(instance, data),
+          execute: (instance, data) =>
+            groupController.updateGSetting(instance, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);
@@ -181,7 +215,8 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: toggleEphemeralSchema,
           ClassRef: GroupToggleEphemeralDto,
-          execute: (instance, data) => groupController.toggleEphemeral(instance, data),
+          execute: (instance, data) =>
+            groupController.toggleEphemeral(instance, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);
@@ -191,7 +226,8 @@ export class GroupRouter extends RouterBroker {
           request: req,
           schema: {},
           ClassRef: GroupJid,
-          execute: (instance, data) => groupController.leaveGroup(instance, data),
+          execute: (instance, data) =>
+            groupController.leaveGroup(instance, data),
         });
 
         res.status(HttpStatus.OK).json(response);

@@ -18,7 +18,8 @@ export class ProxyService {
 
   public async find(instance: InstanceDto): Promise<Proxy> {
     try {
-      const result = await this.waMonitor.waInstances[instance.instanceName].findProxy();
+      const result =
+        await this.waMonitor.waInstances[instance.instanceName].findProxy();
 
       if (Object.keys(result).length === 0) {
         throw new Error('Proxy not found');

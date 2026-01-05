@@ -17,7 +17,8 @@ export class SettingsService {
 
   public async find(instance: InstanceDto): Promise<SettingsDto> {
     try {
-      const result = await this.waMonitor.waInstances[instance.instanceName].findSettings();
+      const result =
+        await this.waMonitor.waInstances[instance.instanceName].findSettings();
 
       if (Object.keys(result).length === 0) {
         throw new Error('Settings not found');

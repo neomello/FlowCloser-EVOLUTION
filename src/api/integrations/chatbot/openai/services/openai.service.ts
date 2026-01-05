@@ -1,7 +1,11 @@
 import { PrismaRepository } from '@api/repository/repository.service';
 import { WAMonitoringService } from '@api/services/monitor.service';
 import { Integration } from '@api/types/wa.types';
-import { ConfigService, Language, Openai as OpenaiConfig } from '@config/env.config';
+import {
+  ConfigService,
+  Language,
+  Openai as OpenaiConfig,
+} from '@config/env.config';
 import { IntegrationSession, OpenaiBot, OpenaiSetting } from '@prisma/client';
 import { sendTelemetry } from '@utils/sendTelemetry';
 import axios from 'axios';
@@ -17,10 +21,17 @@ import { BaseChatbotService } from '../../base-chatbot.service';
  * OpenAI service that extends the common BaseChatbotService
  * Handles both Assistant API and ChatCompletion API
  */
-export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> {
+export class OpenaiService extends BaseChatbotService<
+  OpenaiBot,
+  OpenaiSetting
+> {
   protected client: OpenAI;
 
-  constructor(waMonitor: WAMonitoringService, prismaRepository: PrismaRepository, configService: ConfigService) {
+  constructor(
+    waMonitor: WAMonitoringService,
+    prismaRepository: PrismaRepository,
+    configService: ConfigService
+  ) {
     super(waMonitor, prismaRepository, 'OpenaiService', configService);
   }
 
@@ -50,10 +61,12 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     settings: OpenaiSetting,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ): Promise<void> {
     try {
-      this.logger.log(`Starting process for remoteJid: ${remoteJid}, bot type: ${openaiBot.botType}`);
+      this.logger.log(
+        `Starting process for remoteJid: ${remoteJid}, bot type: ${openaiBot.botType}`
+      );
 
       // Handle audio message transcription
       if (content.startsWith('audioMessage|') && msg) {
@@ -65,7 +78,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
         });
 
         if (!creds) {
-          this.logger.error(`OpenAI credentials not found. CredsId: ${openaiBot.openaiCredsId}`);
+          this.logger.error(
+            `OpenAI credentials not found. CredsId: ${openaiBot.openaiCredsId}`
+          );
           return;
         }
 
@@ -86,7 +101,7 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
             remoteJid,
             "Sorry, I couldn't transcribe your audio message. Could you please type your message instead?",
             settings,
-            true,
+            true
           );
           return;
         }
@@ -97,7 +112,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
         });
 
         if (!creds) {
-          this.logger.error(`OpenAI credentials not found. CredsId: ${openaiBot.openaiCredsId}`);
+          this.logger.error(
+            `OpenAI credentials not found. CredsId: ${openaiBot.openaiCredsId}`
+          );
           return;
         }
 
@@ -108,7 +125,10 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       // Handle keyword finish
       const keywordFinish = settings?.keywordFinish || '';
       const normalizedContent = content.toLowerCase().trim();
-      if (keywordFinish.length > 0 && normalizedContent === keywordFinish.toLowerCase()) {
+      if (
+        keywordFinish.length > 0 &&
+        normalizedContent === keywordFinish.toLowerCase()
+      ) {
         if (settings?.keepOpen) {
           await this.prismaRepository.integrationSession.update({
             where: {
@@ -139,9 +159,12 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
         };
 
         const createSession = await this.createNewSession(
-          { instanceName: instance.instanceName, instanceId: instance.instanceId },
+          {
+            instanceName: instance.instanceName,
+            instanceId: instance.instanceId,
+          },
           data,
-          this.getBotType(),
+          this.getBotType()
         );
 
         await this.initNewSession(
@@ -152,7 +175,7 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
           createSession.session,
           content,
           pushName,
-          msg,
+          msg
         );
 
         await sendTelemetry('/openai/session/start');
@@ -175,9 +198,20 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       }
 
       // Process with the appropriate API based on bot type
-      await this.sendMessageToBot(instance, session, settings, openaiBot, remoteJid, pushName || '', content, msg);
+      await this.sendMessageToBot(
+        instance,
+        session,
+        settings,
+        openaiBot,
+        remoteJid,
+        pushName || '',
+        content,
+        msg
+      );
     } catch (error) {
-      this.logger.error(`Error in process: ${error.message || JSON.stringify(error)}`);
+      this.logger.error(
+        `Error in process: ${error.message || JSON.stringify(error)}`
+      );
       return;
     }
   }
@@ -193,9 +227,11 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     remoteJid: string,
     pushName: string,
     content: string,
-    msg?: any,
+    msg?: any
   ): Promise<void> {
-    this.logger.log(`Sending message to bot for remoteJid: ${remoteJid}, bot type: ${openaiBot.botType}`);
+    this.logger.log(
+      `Sending message to bot for remoteJid: ${remoteJid}, bot type: ${openaiBot.botType}`
+    );
 
     if (!this.client) {
       this.logger.log('Client not initialized, initializing now');
@@ -204,7 +240,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       });
 
       if (!creds) {
-        this.logger.error(`OpenAI credentials not found in sendMessageToBot. CredsId: ${openaiBot.openaiCredsId}`);
+        this.logger.error(
+          `OpenAI credentials not found in sendMessageToBot. CredsId: ${openaiBot.openaiCredsId}`
+        );
         return;
       }
 
@@ -225,19 +263,33 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
           pushName,
           false, // Not fromMe
           content,
-          msg,
+          msg
         );
       } else {
         this.logger.log('Processing with ChatCompletion API');
-        message = await this.processChatCompletionMessage(instance, openaiBot, remoteJid, content, msg);
+        message = await this.processChatCompletionMessage(
+          instance,
+          openaiBot,
+          remoteJid,
+          content,
+          msg
+        );
       }
 
-      this.logger.log(`Got response from OpenAI: ${message?.substring(0, 50)}${message?.length > 50 ? '...' : ''}`);
+      this.logger.log(
+        `Got response from OpenAI: ${message?.substring(0, 50)}${message?.length > 50 ? '...' : ''}`
+      );
 
       // Send the response
       if (message) {
         this.logger.log('Sending message to WhatsApp');
-        await this.sendMessageWhatsApp(instance, remoteJid, message, settings, true);
+        await this.sendMessageWhatsApp(
+          instance,
+          remoteJid,
+          message,
+          settings,
+          true
+        );
       } else {
         this.logger.error('No message to send to WhatsApp');
       }
@@ -253,9 +305,13 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
         },
       });
     } catch (error) {
-      this.logger.error(`Error in sendMessageToBot: ${error.message || JSON.stringify(error)}`);
+      this.logger.error(
+        `Error in sendMessageToBot: ${error.message || JSON.stringify(error)}`
+      );
       if (error.response) {
-        this.logger.error(`API Response data: ${JSON.stringify(error.response.data || {})}`);
+        this.logger.error(
+          `API Response data: ${JSON.stringify(error.response.data || {})}`
+        );
       }
       return;
     }
@@ -272,7 +328,7 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     pushName: string,
     fromMe: boolean,
     content: string,
-    msg?: any,
+    msg?: any
   ): Promise<string> {
     const messageData: any = {
       role: fromMe ? 'assistant' : 'user',
@@ -287,7 +343,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
         let mediaBase64 = msg.message.base64 || null;
 
         if (msg.message.mediaUrl && isURL(msg.message.mediaUrl)) {
-          const result = await axios.get(msg.message.mediaUrl, { responseType: 'arraybuffer' });
+          const result = await axios.get(msg.message.mediaUrl, {
+            responseType: 'arraybuffer',
+          });
           mediaBase64 = Buffer.from(result.data).toString('base64');
         }
 
@@ -329,7 +387,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
           sessionId: threadId,
         },
       });
-      this.logger.log(`Created new thread ID: ${threadId} for session: ${session.id}`);
+      this.logger.log(
+        `Created new thread ID: ${threadId} for session: ${session.id}`
+      );
     }
 
     // Add message to thread
@@ -351,21 +411,33 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     }
 
     // Wait for the assistant to complete
-    const response = await this.getAIResponse(threadId, runAssistant.id, openaiBot.functionUrl, remoteJid, pushName);
+    const response = await this.getAIResponse(
+      threadId,
+      runAssistant.id,
+      openaiBot.functionUrl,
+      remoteJid,
+      pushName
+    );
 
     if (instance.integration === Integration.WHATSAPP_BAILEYS) {
       await instance.client.sendPresenceUpdate('paused', remoteJid);
     }
 
     // Extract the response text safely with type checking
-    let responseText = "I couldn't generate a proper response. Please try again.";
+    let responseText =
+      "I couldn't generate a proper response. Please try again.";
     try {
       const messages = response?.data || [];
       if (messages.length > 0) {
         const messageContent = messages[0]?.content || [];
         if (messageContent.length > 0) {
           const textContent = messageContent[0];
-          if (textContent && 'text' in textContent && textContent.text && 'value' in textContent.text) {
+          if (
+            textContent &&
+            'text' in textContent &&
+            textContent.text &&
+            'value' in textContent.text
+          ) {
             responseText = textContent.text.value;
           }
         }
@@ -398,19 +470,23 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     openaiBot: OpenaiBot,
     remoteJid: string,
     content: string,
-    msg?: any,
+    msg?: any
   ): Promise<string> {
     this.logger.log('Starting processChatCompletionMessage');
 
     // Check if client is initialized
     if (!this.client) {
-      this.logger.log('Client not initialized in processChatCompletionMessage, initializing now');
+      this.logger.log(
+        'Client not initialized in processChatCompletionMessage, initializing now'
+      );
       const creds = await this.prismaRepository.openaiCreds.findUnique({
         where: { id: openaiBot.openaiCredsId },
       });
 
       if (!creds) {
-        this.logger.error(`OpenAI credentials not found. CredsId: ${openaiBot.openaiCredsId}`);
+        this.logger.error(
+          `OpenAI credentials not found. CredsId: ${openaiBot.openaiCredsId}`
+        );
         return 'Error: OpenAI credentials not found';
       }
 
@@ -423,7 +499,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       return 'Error: OpenAI model not configured';
     }
 
-    this.logger.log(`Using model: ${openaiBot.model}, max tokens: ${openaiBot.maxTokens || 500}`);
+    this.logger.log(
+      `Using model: ${openaiBot.model}, max tokens: ${openaiBot.maxTokens || 500}`
+    );
 
     // Get existing conversation history from the session
     const session = await this.prismaRepository.integrationSession.findFirst({
@@ -439,10 +517,14 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     if (session && session.context) {
       try {
         const sessionData =
-          typeof session.context === 'string' ? JSON.parse(session.context as string) : session.context;
+          typeof session.context === 'string'
+            ? JSON.parse(session.context as string)
+            : session.context;
 
         conversationHistory = sessionData.history || [];
-        this.logger.log(`Retrieved conversation history from session, ${conversationHistory.length} messages`);
+        this.logger.log(
+          `Retrieved conversation history from session, ${conversationHistory.length} messages`
+        );
       } catch (error) {
         this.logger.error(`Error parsing session context: ${error.message}`);
         // Continue with empty history if we can't parse the session data
@@ -451,9 +533,15 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     }
 
     // Log bot data
-    this.logger.log(`Bot data - systemMessages: ${JSON.stringify(openaiBot.systemMessages || [])}`);
-    this.logger.log(`Bot data - assistantMessages: ${JSON.stringify(openaiBot.assistantMessages || [])}`);
-    this.logger.log(`Bot data - userMessages: ${JSON.stringify(openaiBot.userMessages || [])}`);
+    this.logger.log(
+      `Bot data - systemMessages: ${JSON.stringify(openaiBot.systemMessages || [])}`
+    );
+    this.logger.log(
+      `Bot data - assistantMessages: ${JSON.stringify(openaiBot.assistantMessages || [])}`
+    );
+    this.logger.log(
+      `Bot data - userMessages: ${JSON.stringify(openaiBot.userMessages || [])}`
+    );
 
     // Prepare system messages
     const systemMessages: any = openaiBot.systemMessages || [];
@@ -496,7 +584,10 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       if (msg.message.mediaUrl || msg.message.base64) {
         messageData.content = [
           { type: 'text', text: media[2] || content },
-          { type: 'image_url', image_url: { url: msg.message.base64 || msg.message.mediaUrl } },
+          {
+            type: 'image_url',
+            image_url: { url: msg.message.base64 || msg.message.mediaUrl },
+          },
         ];
       } else {
         const url = media[1].split('?')[0];
@@ -544,7 +635,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       }
 
       const responseContent = completions.choices[0].message.content;
-      this.logger.log(`Received response from OpenAI: ${JSON.stringify(completions.choices[0])}`);
+      this.logger.log(
+        `Received response from OpenAI: ${JSON.stringify(completions.choices[0])}`
+      );
 
       // Add the current exchange to the conversation history and update the session
       conversationHistory.push(messageData);
@@ -555,7 +648,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
 
       // Limit history length to avoid token limits (keep last 10 messages)
       if (conversationHistory.length > 10) {
-        conversationHistory = conversationHistory.slice(conversationHistory.length - 10);
+        conversationHistory = conversationHistory.slice(
+          conversationHistory.length - 10
+        );
       }
 
       // Save the updated conversation history to the session
@@ -568,15 +663,21 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
             }),
           },
         });
-        this.logger.log(`Updated session with conversation history, now ${conversationHistory.length} messages`);
+        this.logger.log(
+          `Updated session with conversation history, now ${conversationHistory.length} messages`
+        );
       }
 
       return responseContent;
     } catch (error) {
-      this.logger.error(`Error calling OpenAI: ${error.message || JSON.stringify(error)}`);
+      this.logger.error(
+        `Error calling OpenAI: ${error.message || JSON.stringify(error)}`
+      );
       if (error.response) {
         this.logger.error(`API Response status: ${error.response.status}`);
-        this.logger.error(`API Response data: ${JSON.stringify(error.response.data || {})}`);
+        this.logger.error(
+          `API Response data: ${JSON.stringify(error.response.data || {})}`
+        );
       }
       return `Sorry, there was an error: ${error.message || 'Unknown error'}`;
     }
@@ -590,7 +691,7 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     runId: string,
     functionUrl: string | null,
     remoteJid: string,
-    pushName: string,
+    pushName: string
   ) {
     let status = await this.client.beta.threads.runs.retrieve(threadId, runId);
 
@@ -608,7 +709,10 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       status = await this.client.beta.threads.runs.retrieve(threadId, runId);
 
       // Handle tool calls
-      if (status.status === 'requires_action' && status.required_action?.type === 'submit_tool_outputs') {
+      if (
+        status.status === 'requires_action' &&
+        status.required_action?.type === 'submit_tool_outputs'
+      ) {
         const toolCalls = status.required_action.submit_tool_outputs.tool_calls;
         const toolOutputs = [];
 
@@ -658,7 +762,17 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
       return messages;
     } else {
       this.logger.error(`Assistant run failed with status: ${status.status}`);
-      return { data: [{ content: [{ text: { value: 'Failed to get a response from the assistant.' } }] }] };
+      return {
+        data: [
+          {
+            content: [
+              {
+                text: { value: 'Failed to get a response from the assistant.' },
+              },
+            ],
+          },
+        ],
+      };
     }
   }
 
@@ -677,7 +791,9 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     });
 
     if (!settings) {
-      this.logger.error(`OpenAI settings not found. InstanceId: ${instance.instanceId}`);
+      this.logger.error(
+        `OpenAI settings not found. InstanceId: ${instance.instanceId}`
+      );
       return null;
     }
 
@@ -686,16 +802,20 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     });
 
     if (!creds) {
-      this.logger.error(`OpenAI credentials not found. CredsId: ${settings.openaiCredsId}`);
+      this.logger.error(
+        `OpenAI credentials not found. CredsId: ${settings.openaiCredsId}`
+      );
       return null;
     }
 
     let audio: Buffer;
 
     if (msg.message.mediaUrl) {
-      audio = await axios.get(msg.message.mediaUrl, { responseType: 'arraybuffer' }).then((response) => {
-        return Buffer.from(response.data, 'binary');
-      });
+      audio = await axios
+        .get(msg.message.mediaUrl, { responseType: 'arraybuffer' })
+        .then((response) => {
+          return Buffer.from(response.data, 'binary');
+        });
     } else if (msg.message.base64) {
       audio = Buffer.from(msg.message.base64, 'base64');
     } else {
@@ -707,7 +827,7 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
         {
           logger: P({ level: 'error' }) as any,
           reuploadRequest: instance,
-        },
+        }
       );
     }
 
@@ -720,14 +840,20 @@ export class OpenaiService extends BaseChatbotService<OpenaiBot, OpenaiSetting> 
     formData.append('model', 'whisper-1');
     formData.append('language', lang);
 
-    const apiKey = creds?.apiKey || this.configService.get<OpenaiConfig>('OPENAI').API_KEY_GLOBAL;
+    const apiKey =
+      creds?.apiKey ||
+      this.configService.get<OpenaiConfig>('OPENAI').API_KEY_GLOBAL;
 
-    const response = await axios.post('https://api.openai.com/v1/audio/transcriptions', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${apiKey}`,
-      },
-    });
+    const response = await axios.post(
+      'https://api.openai.com/v1/audio/transcriptions',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${apiKey}`,
+        },
+      }
+    );
 
     return response?.data?.text;
   }

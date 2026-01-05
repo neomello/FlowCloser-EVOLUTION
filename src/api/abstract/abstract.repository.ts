@@ -34,9 +34,13 @@ export abstract class Repository implements IRepository {
       mkdirSync(create.path, { recursive: true });
     }
     try {
-      writeFileSync(join(create.path, create.fileName + '.json'), JSON.stringify({ ...create.data }), {
-        encoding: 'utf-8',
-      });
+      writeFileSync(
+        join(create.path, create.fileName + '.json'),
+        JSON.stringify({ ...create.data }),
+        {
+          encoding: 'utf-8',
+        }
+      );
 
       return { message: 'create - success' };
     } finally {
@@ -45,22 +49,32 @@ export abstract class Repository implements IRepository {
   };
 
   // eslint-disable-next-line
-    public insert(data: any, instanceName: string, saveDb = false): Promise<IInsert> {
+  public insert(
+    data: any,
+    instanceName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _saveDb = false
+  ): Promise<IInsert> {
     throw new Error('Method not implemented.');
   }
 
   // eslint-disable-next-line
-    public update(data: any, instanceName: string, saveDb = false): Promise<IInsert> {
+  public update(
+    data: any,
+    instanceName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _saveDb = false
+  ): Promise<IInsert> {
     throw new Error('Method not implemented.');
   }
 
   // eslint-disable-next-line
-    public find(query: any): Promise<any> {
+  public find(query: any): Promise<any> {
     throw new Error('Method not implemented.');
   }
 
   // eslint-disable-next-line
-    delete(query: any, force?: boolean): Promise<any> {
+  delete(query: any, force?: boolean): Promise<any> {
     throw new Error('Method not implemented.');
   }
 }

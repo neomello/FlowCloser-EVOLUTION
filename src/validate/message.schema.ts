@@ -8,7 +8,7 @@ const isNotEmpty = (...propertyNames: string[]): JSONSchema7 => {
       (properties[property] = {
         minLength: 1,
         description: `The "${property}" cannot be empty`,
-      }),
+      })
   );
   return {
     if: {
@@ -97,7 +97,10 @@ export const mediaMessageSchema: JSONSchema7 = {
   type: 'object',
   properties: {
     number: { ...numberDefinition },
-    mediatype: { type: 'string', enum: ['image', 'document', 'video', 'audio'] },
+    mediatype: {
+      type: 'string',
+      enum: ['image', 'document', 'video', 'audio'],
+    },
     mimetype: { type: 'string' },
     media: { type: 'string' },
     fileName: { type: 'string' },
@@ -421,7 +424,10 @@ export const buttonsMessageSchema: JSONSchema7 = {
           phoneNumber: { type: 'string' },
           currency: { type: 'string' },
           name: { type: 'string' },
-          keyType: { type: 'string', enum: ['phone', 'email', 'cpf', 'cnpj', 'random'] },
+          keyType: {
+            type: 'string',
+            enum: ['phone', 'email', 'cpf', 'cnpj', 'random'],
+          },
           key: { type: 'string' },
         },
         required: ['type'],

@@ -3,7 +3,12 @@ import { CacheService } from '@api/services/cache.service';
 import { CacheConf, configService } from '@config/env.config';
 import { Logger } from '@config/logger.config';
 import { INSTANCE_DIR } from '@config/path.config';
-import { AuthenticationState, BufferJSON, initAuthCreds, WAProto as proto } from 'baileys';
+import {
+  AuthenticationState,
+  BufferJSON,
+  initAuthCreds,
+  WAProto as proto,
+} from 'baileys';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -18,7 +23,9 @@ const fixFileName = (file: string): string | undefined => {
 
 export async function keyExists(sessionId: string): Promise<any> {
   try {
-    const key = await prismaRepository.session.findUnique({ where: { sessionId: sessionId } });
+    const key = await prismaRepository.session.findUnique({
+      where: { sessionId: sessionId },
+    });
     return !!key;
   } catch {
     return false;
@@ -48,7 +55,9 @@ export async function getAuthKey(sessionId: string): Promise<any> {
   try {
     const register = await keyExists(sessionId);
     if (!register) return null;
-    const auth = await prismaRepository.session.findUnique({ where: { sessionId: sessionId } });
+    const auth = await prismaRepository.session.findUnique({
+      where: { sessionId: sessionId },
+    });
     return JSON.parse(auth?.creds);
   } catch {
     return null;
@@ -78,14 +87,15 @@ const logger = new Logger('useMultiFileAuthStatePrisma');
 
 export default async function useMultiFileAuthStatePrisma(
   sessionId: string,
-  cache: CacheService,
+  cache: CacheService
 ): Promise<{
   state: AuthenticationState;
   saveCreds: () => Promise<void>;
   removeCreds: () => Promise<void>;
 }> {
   const localFolder = path.join(INSTANCE_DIR, sessionId);
-  const localFile = (key: string) => path.join(localFolder, fixFileName(key) + '.json');
+  const localFile = (key: string) =>
+    path.join(localFolder, fixFileName(key) + '.json');
   await fs.mkdir(localFolder, { recursive: true });
 
   async function writeData(data: any, key: string): Promise<any> {
@@ -186,7 +196,7 @@ export default async function useMultiFileAuthStatePrisma(
               }
 
               data[id] = value;
-            }),
+            })
           );
           return data;
         },

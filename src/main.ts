@@ -23,7 +23,13 @@ import { ServerUP } from '@utils/server-up';
 import axios from 'axios';
 import compression from 'compression';
 import cors from 'cors';
-import express, { json, NextFunction, Request, Response, urlencoded } from 'express';
+import express, {
+  json,
+  NextFunction,
+  Request,
+  Response,
+  urlencoded,
+} from 'express';
 import { join } from 'path';
 
 async function initWA() {
@@ -61,7 +67,7 @@ async function bootstrap() {
     }),
     urlencoded({ extended: true, limit: '136mb' }),
     json({ limit: '136mb' }),
-    compression(),
+    compression()
   );
 
   app.set('view engine', 'hbs');
@@ -77,11 +83,16 @@ async function bootstrap() {
       if (err) {
         const webhook = configService.get<Webhook>('WEBHOOK');
 
-        if (webhook.EVENTS.ERRORS_WEBHOOK && webhook.EVENTS.ERRORS_WEBHOOK != '' && webhook.EVENTS.ERRORS) {
+        if (
+          webhook.EVENTS.ERRORS_WEBHOOK &&
+          webhook.EVENTS.ERRORS_WEBHOOK != '' &&
+          webhook.EVENTS.ERRORS
+        ) {
           const tzoffset = new Date().getTimezoneOffset() * 60000; //offset in milliseconds
           const localISOTime = new Date(Date.now() - tzoffset).toISOString();
           const now = localISOTime;
-          const globalApiKey = configService.get<Auth>('AUTHENTICATION').API_KEY.KEY;
+          const globalApiKey =
+            configService.get<Auth>('AUTHENTICATION').API_KEY.KEY;
           const serverUrl = configService.get<HttpServer>('SERVER').URL;
 
           const errorData = {
@@ -130,7 +141,7 @@ async function bootstrap() {
       });
 
       next();
-    },
+    }
   );
 
   const httpServer = configService.get<HttpServer>('SERVER');
@@ -140,7 +151,9 @@ async function bootstrap() {
 
   if (server === null) {
     logger.warn('SSL cert load failed — falling back to HTTP.');
-    logger.info("Ensure 'SSL_CONF_PRIVKEY' and 'SSL_CONF_FULLCHAIN' env vars point to valid certificate files.");
+    logger.info(
+      "Ensure 'SSL_CONF_PRIVKEY' and 'SSL_CONF_FULLCHAIN' env vars point to valid certificate files."
+    );
 
     httpServer.TYPE = 'http';
     server = ServerUP[httpServer.TYPE];
@@ -157,7 +170,9 @@ async function bootstrap() {
     Sentry.setupExpressErrorHandler(app);
   }
 
-  server.listen(httpServer.PORT, () => logger.log(httpServer.TYPE.toUpperCase() + ' - ON: ' + httpServer.PORT));
+  server.listen(httpServer.PORT, () =>
+    logger.log(httpServer.TYPE.toUpperCase() + ' - ON: ' + httpServer.PORT)
+  );
 
   initWA().catch((error) => {
     logger.error('Error loading instances: ' + error);

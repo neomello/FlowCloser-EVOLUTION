@@ -10,30 +10,30 @@ This document provides comprehensive guidelines for AI agents (Claude, GPT, Curs
 
 ### Core Directories
 
-- **`src/`** – TypeScript source code with modular architecture
-  - `api/controllers/` – HTTP route handlers (thin layer)
-  - `api/services/` – Business logic (core functionality)
-  - `api/routes/` – Express route definitions (RouterBroker pattern)
-  - `api/integrations/` – External service integrations
-    - `channel/` – WhatsApp providers (Baileys, Business API, Evolution)
-    - `chatbot/` – AI/Bot integrations (OpenAI, Dify, Typebot, Chatwoot)
-    - `event/` – Event systems (WebSocket, RabbitMQ, SQS, NATS, Pusher)
-    - `storage/` – File storage (S3, MinIO)
-  - `dto/` – Data Transfer Objects (simple classes, no decorators)
-  - `guards/` – Authentication/authorization middleware
-  - `types/` – TypeScript type definitions
-  - `repository/` – Data access layer (Web3: Kwil DB, Ceramic, The Graph)
-- **`config/`** – Environment and application configuration
-- **`utils/`** – Shared utilities and helper functions
-- **`validate/`** – JSONSchema7 validation schemas
-- **`exceptions/`** – Custom HTTP exception classes
-- **`cache/`** – Redis and local cache implementations
+-  `src/` – TypeScript source code with modular architecture
+-  `api/controllers/` – HTTP route handlers (thin layer)
+-  `api/services/` – Business logic (core functionality)
+-  `api/routes/` – Express route definitions (RouterBroker pattern)
+-  `api/integrations/` – External service integrations
+-  `channel/` – WhatsApp providers (Baileys, Business API, Evolution)
+-  `chatbot/` – AI/Bot integrations (OpenAI, Dify, Typebot, Chatwoot)
+-  `event/` – Event systems (WebSocket, RabbitMQ, SQS, NATS, Pusher)
+-  `storage/` – File storage (S3, MinIO)
+-  `dto/` – Data Transfer Objects (simple classes, no decorators)
+-  `guards/` – Authentication/authorization middleware
+-  `types/` – TypeScript type definitions
+-  `repository/` – Data access layer (Web3: Kwil DB, Ceramic, The Graph)
+-  **`config/`** – Environment and application configuration
+-  **`utils/`** – Shared utilities and helper functions
+-  **`validate/`** – JSONSchema7 validation schemas
+-  **`exceptions/`** – Custom HTTP exception classes
+-  **`cache/`** – Redis and local cache implementations
 
 ### Build & Deployment
 
-- **`dist/`** – Build output (do not edit directly)
-- **`public/`** – Static assets and media files
-- **`Docker*`**, **`docker-compose*.yaml`** – Containerization and local development stack
+-  **`dist/`** – Build output (do not edit directly)
+-  **`public/`** – Static assets and media files
+-  **`Docker*`**, **`docker-compose*.yaml`** – Containerization and local development stack
 
 ## Build, Test, and Development Commands
 
@@ -66,14 +66,14 @@ npm run commit      # Interactive commit with Commitizen
 
 FlowCloser-EVOLUTION uses a decentralized, web3-aligned architecture:
 
-- **Kwil DB** → Decentralized SQL database via consensus
-- **Ceramic** → Immutable logs with DID (Decentralized Identifiers)
-- **The Graph** → Distributed indexing and querying
-- **Gun.js** → Real-time P2P synchronization without servers
-- **IPFS** → Permanent, distributed storage
-- **Multi-layer redundancy** → High availability and fault tolerance
-- **Censorship resistant** → No single point of failure or control
-- **100% web3 aligned** → Fully decentralized infrastructure
+-  **Kwil DB** → Decentralized SQL database via consensus
+-  **Ceramic** → Immutable logs with DID (Decentralized Identifiers)
+-  **The Graph** → Distributed indexing and querying
+-  **Gun.js** → Real-time P2P synchronization without servers
+-  **IPFS** → Permanent, distributed storage
+-  **Multi-layer redundancy** → High availability and fault tolerance
+-  **Censorship resistant** → No single point of failure or control
+-  **100% web3 aligned** → Fully decentralized infrastructure
 
 ### Web3 Development Setup
 
@@ -89,16 +89,16 @@ npm run dev:server
 
 ### Code Style (Enforced by ESLint + Prettier)
 
-- **TypeScript strict mode** with full type coverage
-- **2-space indentation**, single quotes, trailing commas
-- **120-character line limit**
-- **Import order** via `simple-import-sort`
-- **File naming**: `feature.kind.ts` (e.g., `whatsapp.baileys.service.ts`)
-- **Naming conventions**:
-  - Classes: `PascalCase`
-  - Functions/variables: `camelCase`
-  - Constants: `UPPER_SNAKE_CASE`
-  - Files: `kebab-case.type.ts`
+-  **TypeScript strict mode** with full type coverage
+-  **2-space indentation**, single quotes, trailing commas
+-  **120-character line limit**
+-  **Import order** via `simple-import-sort`
+-  **File naming**: `feature.kind.ts` (e.g., `whatsapp.baileys.service.ts`)
+-  **Naming conventions**:
+-  Classes: `PascalCase`
+-  Functions/variables: `camelCase`
+-  Constants: `UPPER_SNAKE_CASE`
+-  Files: `kebab-case.type.ts`
 
 ### Architecture Patterns
 
@@ -197,10 +197,10 @@ export const exampleSchema: JSONSchema7 = {
 
 ### Instance Isolation
 
-- **CRITICAL**: All operations must be scoped by `instanceName` or `instanceId`
-- **Database queries**: Always include `where: { instanceId: ... }`
-- **Authentication**: Validate instance ownership before operations
-- **Data isolation**: Complete separation between tenant instances
+-  **CRITICAL**: All operations must be scoped by `instanceName` or `instanceId`
+-  **Database queries**: Always include `where: { instanceId: ... }`
+-  **Authentication**: Validate instance ownership before operations
+-  **Data isolation**: Complete separation between tenant instances
 
 ### WhatsApp Instance Management
 
@@ -218,11 +218,11 @@ FlowCloser-EVOLUTION uses a decentralized, web3-aligned architecture:
 
 ### Decentralized Data Storage
 
-- **Kwil DB**: Decentralized SQL database via consensus
-- **Ceramic**: Immutable logs with DID (Decentralized Identifiers)
-- **The Graph**: Distributed indexing and querying
-- **Gun.js**: Real-time P2P synchronization without servers
-- **IPFS**: Permanent, distributed storage
+-  **Kwil DB**: Decentralized SQL database via consensus
+-  **Ceramic**: Immutable logs with DID (Decentralized Identifiers)
+-  **The Graph**: Distributed indexing and querying
+-  **Gun.js**: Real-time P2P synchronization without servers
+-  **IPFS**: Permanent, distributed storage
 
 ### Web3 Repository Pattern
 
@@ -236,31 +236,31 @@ FlowCloser-EVOLUTION uses a decentralized, web3-aligned architecture:
 
 ### Channel Integration (WhatsApp Providers)
 
-- **Baileys**: WhatsApp Web with QR code authentication
-- **Business API**: Official Meta WhatsApp Business API  
-- **Evolution API**: Custom WhatsApp integration
-- **Pattern**: Extend base channel service classes
+-  **Baileys**: WhatsApp Web with QR code authentication
+-  **Business API**: Official Meta WhatsApp Business API  
+-  **Evolution API**: Custom WhatsApp integration
+-  **Pattern**: Extend base channel service classes
 
 ### Chatbot Integration
 
-- **Base classes**: Extend `BaseChatbotService` and `BaseChatbotController`
-- **Trigger system**: Support keyword, regex, and advanced triggers
-- **Session management**: Handle conversation state per user
-- **Available integrations**: EvolutionBot, OpenAI, Dify, Typebot, Chatwoot, Flowise, N8N, EvoAI
+-  **Base classes**: Extend `BaseChatbotService` and `BaseChatbotController`
+-  **Trigger system**: Support keyword, regex, and advanced triggers
+-  **Session management**: Handle conversation state per user
+-  **Available integrations**: EvolutionBot, OpenAI, Dify, Typebot, Chatwoot, Flowise, N8N, EvoAI
 
 ### Event Integration
 
-- **Internal events**: EventEmitter2 for application events
-- **External events**: WebSocket, RabbitMQ, SQS, NATS, Pusher
-- **Webhook delivery**: Reliable delivery with retry logic
+-  **Internal events**: EventEmitter2 for application events
+-  **External events**: WebSocket, RabbitMQ, SQS, NATS, Pusher
+-  **Webhook delivery**: Reliable delivery with retry logic
 
 ## Testing Guidelines
 
 ### Current State
 
-- **No formal test suite** currently implemented
-- **Manual testing** is the primary approach
-- **Integration testing** in development environment
+-  **No formal test suite** currently implemented
+-  **Manual testing** is the primary approach
+-  **Integration testing** in development environment
 
 ### Testing Strategy
 
@@ -279,10 +279,10 @@ describe('ExampleService', () => {
 
 ### Recommended Approach
 
-- Focus on **critical business logic** in services
-- **Mock external dependencies** (WhatsApp APIs, databases)
-- **Integration tests** for API endpoints
-- **Manual testing** for WhatsApp connection flows
+-  Focus on **critical business logic** in services
+-  **Mock external dependencies** (WhatsApp APIs, databases)
+-  **Integration tests** for API endpoints
+-  **Manual testing** for WhatsApp connection flows
 
 ## Commit & Pull Request Guidelines
 
@@ -298,18 +298,18 @@ npm run commit
 
 ### Examples
 
-- `feat(api): add WhatsApp message status endpoint`
-- `fix(baileys): resolve connection timeout issue`
-- `docs(readme): update installation instructions`
-- `refactor(service): extract common message validation logic`
+-  `feat(api): add WhatsApp message status endpoint`
+-  `fix(baileys): resolve connection timeout issue`
+-  `docs(readme): update installation instructions`
+-  `refactor(service): extract common message validation logic`
 
 ### Pull Request Requirements
 
-- **Clear description** of changes and motivation
-- **Linked issues** if applicable
-- **Migration impact** (specify database provider)
-- **Local testing steps** with screenshots/logs
-- **Breaking changes** clearly documented
+-  **Clear description** of changes and motivation
+-  **Linked issues** if applicable
+-  **Migration impact** (specify database provider)
+-  **Local testing steps** with screenshots/logs
+-  **Breaking changes** clearly documented
 
 ## Security & Configuration
 
@@ -329,54 +329,54 @@ IPFS_NODE_URL=
 
 ### Security Best Practices
 
-- **API key authentication** via `apikey` header
-- **Input validation** with JSONSchema7
-- **Rate limiting** on all endpoints
-- **Webhook signature validation**
-- **Instance-based access control**
-- **Secure defaults** for all configurations
+-  **API key authentication** via `apikey` header
+-  **Input validation** with JSONSchema7
+-  **Rate limiting** on all endpoints
+-  **Webhook signature validation**
+-  **Instance-based access control**
+-  **Secure defaults** for all configurations
 
 ### Vulnerability Reporting
 
-- See `SECURITY.md` for security vulnerability reporting process
-- Contact: `contato@evolution-api.com`
+-  See `SECURITY.md` for security vulnerability reporting process
+-  Contact: `contato@evolution-api.com`
 
 ## Communication Standards
 
 ### Language Requirements
 
-- **User communication**: Always respond in Portuguese (PT-BR)
-- **Code/comments**: English for technical documentation
-- **API responses**: English for consistency
-- **Error messages**: Portuguese for user-facing errors
+-  **User communication**: Always respond in Portuguese (PT-BR)
+-  **Code/comments**: English for technical documentation
+-  **API responses**: English for consistency
+-  **Error messages**: Portuguese for user-facing errors
 
 ### Documentation Standards
 
-- **Inline comments**: Document complex business logic
-- **API documentation**: Document all public endpoints
-- **Integration guides**: Document new integration patterns
-- **Migration guides**: Document database schema changes
+-  **Inline comments**: Document complex business logic
+-  **API documentation**: Document all public endpoints
+-  **Integration guides**: Document new integration patterns
+-  **Migration guides**: Document database schema changes
 
 ## Performance & Scalability
 
 ### Caching Strategy
 
-- **Redis primary**: Distributed caching for production
-- **Node-cache fallback**: Local caching when Redis unavailable
-- **TTL strategy**: Appropriate cache expiration per data type
-- **Cache invalidation**: Proper invalidation on data changes
+-  **Redis primary**: Distributed caching for production
+-  **Node-cache fallback**: Local caching when Redis unavailable
+-  **TTL strategy**: Appropriate cache expiration per data type
+-  **Cache invalidation**: Proper invalidation on data changes
 
 ### Connection Management
 
-- **Web3 Data Layer**: Kwil DB consensus, Ceramic streams, The Graph indexing
-- **WhatsApp**: One connection per instance with lifecycle management
-- **P2P Sync**: Gun.js for real-time synchronization without servers
-- **Storage**: IPFS for permanent, distributed file storage
-- **External APIs**: Rate limiting and retry with exponential backoff
+-  **Web3 Data Layer**: Kwil DB consensus, Ceramic streams, The Graph indexing
+-  **WhatsApp**: One connection per instance with lifecycle management
+-  **P2P Sync**: Gun.js for real-time synchronization without servers
+-  **Storage**: IPFS for permanent, distributed file storage
+-  **External APIs**: Rate limiting and retry with exponential backoff
 
 ### Monitoring & Observability
 
-- **Structured logging**: Pino logger with correlation IDs
-- **Error tracking**: Comprehensive error scenarios
-- **Health checks**: Instance status and connection monitoring
-- **Telemetry**: Usage analytics (non-sensitive data only)
+-  **Structured logging**: Pino logger with correlation IDs
+-  **Error tracking**: Comprehensive error scenarios
+-  **Health checks**: Instance status and connection monitoring
+-  **Telemetry**: Usage analytics (non-sensitive data only)

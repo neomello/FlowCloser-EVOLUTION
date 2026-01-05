@@ -41,7 +41,8 @@ export class N8nRouter extends RouterBroker {
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => n8nController.fetchBot(instance, req.params.n8nId),
+          execute: (instance) =>
+            n8nController.fetchBot(instance, req.params.n8nId),
         });
         res.status(HttpStatus.OK).json(response);
       })
@@ -50,7 +51,8 @@ export class N8nRouter extends RouterBroker {
           request: req,
           schema: n8nSchema,
           ClassRef: N8nDto,
-          execute: (instance, data) => n8nController.updateBot(instance, req.params.n8nId, data),
+          execute: (instance, data) =>
+            n8nController.updateBot(instance, req.params.n8nId, data),
         });
         res.status(HttpStatus.OK).json(response);
       })
@@ -59,7 +61,8 @@ export class N8nRouter extends RouterBroker {
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => n8nController.deleteBot(instance, req.params.n8nId),
+          execute: (instance) =>
+            n8nController.deleteBot(instance, req.params.n8nId),
         });
         res.status(HttpStatus.OK).json(response);
       })
@@ -86,19 +89,25 @@ export class N8nRouter extends RouterBroker {
           request: req,
           schema: n8nStatusSchema,
           ClassRef: InstanceDto,
-          execute: (instance, data) => n8nController.changeStatus(instance, data),
+          execute: (instance, data) =>
+            n8nController.changeStatus(instance, data),
         });
         res.status(HttpStatus.OK).json(response);
       })
-      .get(this.routerPath('fetchSessions/:n8nId'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => n8nController.fetchSessions(instance, req.params.n8nId),
-        });
-        res.status(HttpStatus.OK).json(response);
-      })
+      .get(
+        this.routerPath('fetchSessions/:n8nId'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              n8nController.fetchSessions(instance, req.params.n8nId),
+          });
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('ignoreJid'), ...guards, async (req, res) => {
         const response = await this.dataValidate<IgnoreJidDto>({
           request: req,

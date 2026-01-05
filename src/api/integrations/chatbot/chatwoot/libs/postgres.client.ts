@@ -38,7 +38,8 @@ class Postgres {
   }
 
   getChatwootConnection() {
-    const uri = configService.get<Chatwoot>('CHATWOOT').IMPORT.DATABASE.CONNECTION.URI;
+    const uri =
+      configService.get<Chatwoot>('CHATWOOT').IMPORT.DATABASE.CONNECTION.URI;
 
     return this.getConnection(uri);
   }

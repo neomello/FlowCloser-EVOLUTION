@@ -2,12 +2,21 @@ import { PrismaRepository } from '@api/repository/repository.service';
 import { WAMonitoringService } from '@api/services/monitor.service';
 import { Logger } from '@config/logger.config';
 
-import { ChannelController, ChannelControllerInterface } from '../channel.controller';
+import {
+  ChannelController,
+  ChannelControllerInterface,
+} from '../channel.controller';
 
-export class EvolutionController extends ChannelController implements ChannelControllerInterface {
+export class EvolutionController
+  extends ChannelController
+  implements ChannelControllerInterface
+{
   private readonly logger = new Logger('EvolutionController');
 
-  constructor(prismaRepository: PrismaRepository, waMonitor: WAMonitoringService) {
+  constructor(
+    prismaRepository: PrismaRepository,
+    waMonitor: WAMonitoringService
+  ) {
     super(prismaRepository, waMonitor);
   }
 
@@ -17,7 +26,9 @@ export class EvolutionController extends ChannelController implements ChannelCon
     const numberId = data.numberId;
 
     if (!numberId) {
-      this.logger.error('WebhookService -> receiveWebhookEvolution -> numberId not found');
+      this.logger.error(
+        'WebhookService -> receiveWebhookEvolution -> numberId not found'
+      );
       return;
     }
 
@@ -26,7 +37,9 @@ export class EvolutionController extends ChannelController implements ChannelCon
     });
 
     if (!instance) {
-      this.logger.error('WebhookService -> receiveWebhook -> instance not found');
+      this.logger.error(
+        'WebhookService -> receiveWebhook -> instance not found'
+      );
       return;
     }
 

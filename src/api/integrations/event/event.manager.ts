@@ -8,7 +8,10 @@ export class EventManager {
   private waMonitor: WAMonitoringService;
   private webhookController: WebhookController;
 
-  constructor(prismaRepository: PrismaRepository, waMonitor: WAMonitoringService) {
+  constructor(
+    prismaRepository: PrismaRepository,
+    waMonitor: WAMonitoringService
+  ) {
     this.prisma = prismaRepository;
     this.monitor = waMonitor;
 

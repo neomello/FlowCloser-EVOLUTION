@@ -1,7 +1,12 @@
 import { InstanceDto } from '@api/dto/instance.dto';
 import { cache, prismaRepository, waMonitor } from '@api/server.module';
 import { CacheConf, configService } from '@config/env.config';
-import { BadRequestException, ForbiddenException, InternalServerErrorException, NotFoundException } from '@exceptions';
+import {
+  BadRequestException,
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@exceptions';
 import { NextFunction, Request, Response } from 'express';
 
 async function getInstance(instanceName: string) {
@@ -16,14 +21,28 @@ async function getInstance(instanceName: string) {
       return exists || keyExists;
     }
 
-    return exists || (await prismaRepository.instance.findMany({ where: { name: instanceName } })).length > 0;
+    return (
+      exists ||
+      (
+        await prismaRepository.instance.findMany({
+          where: { name: instanceName },
+        })
+      ).length > 0
+    );
   } catch (error) {
     throw new InternalServerErrorException(error?.toString());
   }
 }
 
-export async function instanceExistsGuard(req: Request, _: Response, next: NextFunction) {
-  if (req.originalUrl.includes('/instance/create') || req.originalUrl.includes('/instance/fetchInstances')) {
+export async function instanceExistsGuard(
+  req: Request,
+  _: Response,
+  next: NextFunction
+) {
+  if (
+    req.originalUrl.includes('/instance/create') ||
+    req.originalUrl.includes('/instance/fetchInstances')
+  ) {
     return next();
   }
 
@@ -33,17 +52,25 @@ export async function instanceExistsGuard(req: Request, _: Response, next: NextF
   }
 
   if (!(await getInstance(param.instanceName))) {
-    throw new NotFoundException(`The "${param.instanceName}" instance does not exist`);
+    throw new NotFoundException(
+      `The "${param.instanceName}" instance does not exist`
+    );
   }
 
   next();
 }
 
-export async function instanceLoggedGuard(req: Request, _: Response, next: NextFunction) {
+export async function instanceLoggedGuard(
+  req: Request,
+  _: Response,
+  next: NextFunction
+) {
   if (req.originalUrl.includes('/instance/create')) {
     const instance = req.body as InstanceDto;
     if (await getInstance(instance.instanceName)) {
-      throw new ForbiddenException(`This name "${instance.instanceName}" is already in use.`);
+      throw new ForbiddenException(
+        `This name "${instance.instanceName}" is already in use.`
+      );
     }
 
     if (waMonitor.waInstances[instance.instanceName]) {

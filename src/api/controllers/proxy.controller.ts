@@ -12,12 +12,14 @@ const logger = new Logger('ProxyController');
 export class ProxyController {
   constructor(
     private readonly proxyService: ProxyService,
-    private readonly waMonitor: WAMonitoringService,
+    private readonly waMonitor: WAMonitoringService
   ) {}
 
   public async createProxy(instance: InstanceDto, data: ProxyDto) {
     if (!this.waMonitor.waInstances[instance.instanceName]) {
-      throw new NotFoundException(`The "${instance.instanceName}" instance does not exist`);
+      throw new NotFoundException(
+        `The "${instance.instanceName}" instance does not exist`
+      );
     }
 
     if (!data?.enabled) {
@@ -40,7 +42,9 @@ export class ProxyController {
 
   public async findProxy(instance: InstanceDto) {
     if (!this.waMonitor.waInstances[instance.instanceName]) {
-      throw new NotFoundException(`The "${instance.instanceName}" instance does not exist`);
+      throw new NotFoundException(
+        `The "${instance.instanceName}" instance does not exist`
+      );
     }
 
     return this.proxyService.find(instance);

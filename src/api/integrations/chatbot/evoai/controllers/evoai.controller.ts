@@ -10,11 +10,14 @@ import { Evoai as EvoaiModel, IntegrationSession } from '@prisma/client';
 
 import { BaseChatbotController } from '../../base-chatbot.controller';
 
-export class EvoaiController extends BaseChatbotController<EvoaiModel, EvoaiDto> {
+export class EvoaiController extends BaseChatbotController<
+  EvoaiModel,
+  EvoaiDto
+> {
   constructor(
     private readonly evoaiService: EvoaiService,
     prismaRepository: PrismaRepository,
-    waMonitor: WAMonitoringService,
+    waMonitor: WAMonitoringService
   ) {
     super(prismaRepository, waMonitor);
 
@@ -30,7 +33,9 @@ export class EvoaiController extends BaseChatbotController<EvoaiModel, EvoaiDto>
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
 
   protected getFallbackBotId(settings: any): string | undefined {
     return settings?.evoaiIdFallback;
@@ -60,7 +65,11 @@ export class EvoaiController extends BaseChatbotController<EvoaiModel, EvoaiDto>
   }
 
   // Implementation for bot-specific duplicate validation on update
-  protected async validateNoDuplicatesOnUpdate(botId: string, instanceId: string, data: EvoaiDto): Promise<void> {
+  protected async validateNoDuplicatesOnUpdate(
+    botId: string,
+    instanceId: string,
+    data: EvoaiDto
+  ): Promise<void> {
     const checkDuplicate = await this.botRepository.findFirst({
       where: {
         id: {
@@ -79,7 +88,8 @@ export class EvoaiController extends BaseChatbotController<EvoaiModel, EvoaiDto>
 
   // Override createBot to add EvoAI-specific validation
   public async createBot(instance: InstanceDto, data: EvoaiDto) {
-    if (!this.integrationEnabled) throw new BadRequestException('Evoai is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Evoai is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -115,8 +125,17 @@ export class EvoaiController extends BaseChatbotController<EvoaiModel, EvoaiDto>
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
-    await this.evoaiService.process(instance, remoteJid, bot, session, settings, content, pushName, msg);
+    await this.evoaiService.process(
+      instance,
+      remoteJid,
+      bot,
+      session,
+      settings,
+      content,
+      pushName,
+      msg
+    );
   }
 }

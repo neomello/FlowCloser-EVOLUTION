@@ -1,5 +1,8 @@
 import { InstanceDto } from '@api/dto/instance.dto';
-import { OpenaiCredsDto, OpenaiDto } from '@api/integrations/chatbot/openai/dto/openai.dto';
+import {
+  OpenaiCredsDto,
+  OpenaiDto,
+} from '@api/integrations/chatbot/openai/dto/openai.dto';
 import { OpenaiService } from '@api/integrations/chatbot/openai/services/openai.service';
 import { PrismaRepository } from '@api/repository/repository.service';
 import { WAMonitoringService } from '@api/services/monitor.service';
@@ -11,11 +14,14 @@ import OpenAI from 'openai';
 
 import { BaseChatbotController } from '../../base-chatbot.controller';
 
-export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto> {
+export class OpenaiController extends BaseChatbotController<
+  OpenaiBot,
+  OpenaiDto
+> {
   constructor(
     private readonly openaiService: OpenaiService,
     prismaRepository: PrismaRepository,
-    waMonitor: WAMonitoringService,
+    waMonitor: WAMonitoringService
   ) {
     super(prismaRepository, waMonitor);
 
@@ -32,7 +38,9 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
   private client: OpenAI;
   private credsRepository: any;
 
@@ -78,7 +86,11 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
   }
 
   // Implementation for bot-specific duplicate validation on update
-  protected async validateNoDuplicatesOnUpdate(botId: string, instanceId: string, data: OpenaiDto): Promise<void> {
+  protected async validateNoDuplicatesOnUpdate(
+    botId: string,
+    instanceId: string,
+    data: OpenaiDto
+  ): Promise<void> {
     let whereDuplication: any = {
       id: {
         not: botId,
@@ -119,7 +131,8 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
 
   // Override createBot to handle OpenAI-specific credential logic
   public async createBot(instance: InstanceDto, data: OpenaiDto) {
-    if (!this.integrationEnabled) throw new BadRequestException('Openai is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Openai is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -179,8 +192,10 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
         keywordFinish: data.keywordFinish || 'bye',
         delayMessage: data.delayMessage || 1000,
         unknownMessage: data.unknownMessage || 'Sorry, I dont understand',
-        listeningFromMe: data.listeningFromMe !== undefined ? data.listeningFromMe : true,
-        stopBotFromMe: data.stopBotFromMe !== undefined ? data.stopBotFromMe : true,
+        listeningFromMe:
+          data.listeningFromMe !== undefined ? data.listeningFromMe : true,
+        stopBotFromMe:
+          data.stopBotFromMe !== undefined ? data.stopBotFromMe : true,
         keepOpen: data.keepOpen !== undefined ? data.keepOpen : false,
         debounceTime: data.debounceTime || 1,
         ignoreJids: data.ignoreJids || [],
@@ -215,14 +230,24 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
-    await this.openaiService.process(instance, remoteJid, bot, session, settings, content, pushName, msg);
+    await this.openaiService.process(
+      instance,
+      remoteJid,
+      bot,
+      session,
+      settings,
+      content,
+      pushName,
+      msg
+    );
   }
 
   // Credentials - OpenAI specific functionality
   public async createOpenaiCreds(instance: InstanceDto, data: OpenaiCredsDto) {
-    if (!this.integrationEnabled) throw new BadRequestException('Openai is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Openai is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -243,7 +268,9 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
     });
 
     if (existingApiKey) {
-      throw new BadRequestException('This API key is already registered. Please use a different API key.');
+      throw new BadRequestException(
+        'This API key is already registered. Please use a different API key.'
+      );
     }
 
     // Check if name already exists for this instance
@@ -255,7 +282,9 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
     });
 
     if (existingName) {
-      throw new BadRequestException('This credential name is already in use. Please choose a different name.');
+      throw new BadRequestException(
+        'This credential name is already in use. Please choose a different name.'
+      );
     }
 
     try {
@@ -275,7 +304,8 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
   }
 
   public async findOpenaiCreds(instance: InstanceDto) {
-    if (!this.integrationEnabled) throw new BadRequestException('Openai is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Openai is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -298,7 +328,8 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
   }
 
   public async deleteCreds(instance: InstanceDto, openaiCredsId: string) {
-    if (!this.integrationEnabled) throw new BadRequestException('Openai is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Openai is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -338,7 +369,8 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
 
   // Override the settings method to handle the OpenAI credentials
   public async settings(instance: InstanceDto, data: any) {
-    if (!this.integrationEnabled) throw new BadRequestException('Openai is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Openai is disabled');
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -421,7 +453,8 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
 
   // Models - OpenAI specific functionality
   public async getModels(instance: InstanceDto, openaiCredsId?: string) {
-    if (!this.integrationEnabled) throw new BadRequestException('Openai is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Openai is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -444,7 +477,8 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
         },
       });
 
-      if (!creds) throw new Error('OpenAI credentials not found for the provided ID');
+      if (!creds)
+        throw new Error('OpenAI credentials not found for the provided ID');
 
       apiKey = creds.apiKey;
     } else {
@@ -462,7 +496,7 @@ export class OpenaiController extends BaseChatbotController<OpenaiBot, OpenaiDto
 
       if (!defaultSettings.OpenaiCreds)
         throw new Error(
-          'OpenAI credentials not found. Please create credentials and associate them with the settings.',
+          'OpenAI credentials not found. Please create credentials and associate them with the settings.'
         );
 
       apiKey = defaultSettings.OpenaiCreds.apiKey;

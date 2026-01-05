@@ -14,61 +14,79 @@ export class BaileysRouter extends RouterBroker {
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => baileysController.onWhatsapp(instance, req.body),
+          execute: (instance) =>
+            baileysController.onWhatsapp(instance, req.body),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .post(this.routerPath('profilePictureUrl'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => baileysController.profilePictureUrl(instance, req.body),
-        });
+      .post(
+        this.routerPath('profilePictureUrl'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              baileysController.profilePictureUrl(instance, req.body),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('assertSessions'), ...guards, async (req, res) => {
         const response = await this.dataValidate<InstanceDto>({
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => baileysController.assertSessions(instance, req.body),
+          execute: (instance) =>
+            baileysController.assertSessions(instance, req.body),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .post(this.routerPath('createParticipantNodes'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => baileysController.createParticipantNodes(instance, req.body),
-        });
+      .post(
+        this.routerPath('createParticipantNodes'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              baileysController.createParticipantNodes(instance, req.body),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('getUSyncDevices'), ...guards, async (req, res) => {
         const response = await this.dataValidate<InstanceDto>({
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => baileysController.getUSyncDevices(instance, req.body),
+          execute: (instance) =>
+            baileysController.getUSyncDevices(instance, req.body),
         });
 
         res.status(HttpStatus.OK).json(response);
       })
-      .post(this.routerPath('generateMessageTag'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => baileysController.generateMessageTag(instance),
-        });
+      .post(
+        this.routerPath('generateMessageTag'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              baileysController.generateMessageTag(instance),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('sendNode'), ...guards, async (req, res) => {
         const response = await this.dataValidate<InstanceDto>({
           request: req,
@@ -79,16 +97,24 @@ export class BaileysRouter extends RouterBroker {
 
         res.status(HttpStatus.OK).json(response);
       })
-      .post(this.routerPath('signalRepositoryDecryptMessage'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<InstanceDto>({
-          request: req,
-          schema: instanceSchema,
-          ClassRef: InstanceDto,
-          execute: (instance) => baileysController.signalRepositoryDecryptMessage(instance, req.body),
-        });
+      .post(
+        this.routerPath('signalRepositoryDecryptMessage'),
+        ...guards,
+        async (req, res) => {
+          const response = await this.dataValidate<InstanceDto>({
+            request: req,
+            schema: instanceSchema,
+            ClassRef: InstanceDto,
+            execute: (instance) =>
+              baileysController.signalRepositoryDecryptMessage(
+                instance,
+                req.body
+              ),
+          });
 
-        res.status(HttpStatus.OK).json(response);
-      })
+          res.status(HttpStatus.OK).json(response);
+        }
+      )
       .post(this.routerPath('getAuthState'), ...guards, async (req, res) => {
         const response = await this.dataValidate<InstanceDto>({
           request: req,

@@ -44,7 +44,7 @@ export class EventController {
     prismaRepository: PrismaRepository,
     waMonitor: WAMonitoringService,
     integrationStatus: boolean,
-    integrationName: string,
+    integrationName: string
   ) {
     this.prisma = prismaRepository;
     this.monitor = waMonitor;
@@ -84,7 +84,10 @@ export class EventController {
     return this.integrationStatus;
   }
 
-  public async set(instanceName: string, data: EventDto): Promise<wa.LocalEvent> {
+  public async set(
+    instanceName: string,
+    data: EventDto
+  ): Promise<wa.LocalEvent> {
     if (!this.status) {
       return;
     }

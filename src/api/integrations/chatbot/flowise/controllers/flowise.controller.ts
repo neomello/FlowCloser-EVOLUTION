@@ -10,11 +10,14 @@ import { BaseChatbotController } from '../../base-chatbot.controller';
 import { FlowiseDto } from '../dto/flowise.dto';
 import { FlowiseService } from '../services/flowise.service';
 
-export class FlowiseController extends BaseChatbotController<FlowiseModel, FlowiseDto> {
+export class FlowiseController extends BaseChatbotController<
+  FlowiseModel,
+  FlowiseDto
+> {
   constructor(
     private readonly flowiseService: FlowiseService,
     prismaRepository: PrismaRepository,
-    waMonitor: WAMonitoringService,
+    waMonitor: WAMonitoringService
   ) {
     super(prismaRepository, waMonitor);
 
@@ -30,7 +33,9 @@ export class FlowiseController extends BaseChatbotController<FlowiseModel, Flowi
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
 
   protected getFallbackBotId(settings: any): string | undefined {
     return settings?.flowiseIdFallback;
@@ -58,7 +63,11 @@ export class FlowiseController extends BaseChatbotController<FlowiseModel, Flowi
     };
   }
 
-  protected async validateNoDuplicatesOnUpdate(botId: string, instanceId: string, data: FlowiseDto): Promise<void> {
+  protected async validateNoDuplicatesOnUpdate(
+    botId: string,
+    instanceId: string,
+    data: FlowiseDto
+  ): Promise<void> {
     const checkDuplicate = await this.botRepository.findFirst({
       where: {
         id: { not: botId },
@@ -82,14 +91,24 @@ export class FlowiseController extends BaseChatbotController<FlowiseModel, Flowi
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
-    await this.flowiseService.processBot(instance, remoteJid, bot, session, settings, content, pushName, msg);
+    await this.flowiseService.processBot(
+      instance,
+      remoteJid,
+      bot,
+      session,
+      settings,
+      content,
+      pushName,
+      msg
+    );
   }
 
   // Override createBot to add module availability check and Flowise-specific validation
   public async createBot(instance: InstanceDto, data: FlowiseDto) {
-    if (!this.integrationEnabled) throw new BadRequestException('Flowise is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('Flowise is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({

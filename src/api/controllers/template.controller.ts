@@ -15,12 +15,21 @@ export class TemplateController {
 
   public async editTemplate(
     instance: InstanceDto,
-    data: { templateId: string; category?: string; components?: any; allowCategoryChange?: boolean; ttl?: number },
+    data: {
+      templateId: string;
+      category?: string;
+      components?: any;
+      allowCategoryChange?: boolean;
+      ttl?: number;
+    }
   ) {
     return this.templateService.edit(instance, data);
   }
 
-  public async deleteTemplate(instance: InstanceDto, data: { name: string; hsmId?: string }) {
+  public async deleteTemplate(
+    instance: InstanceDto,
+    data: { name: string; hsmId?: string }
+  ) {
     return this.templateService.delete(instance, data);
   }
 }

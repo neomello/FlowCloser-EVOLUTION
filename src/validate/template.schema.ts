@@ -8,7 +8,7 @@ const isNotEmpty = (...propertyNames: string[]): JSONSchema7 => {
       (properties[property] = {
         minLength: 1,
         description: `The "${property}" cannot be empty`,
-      }),
+      })
   );
   return {
     if: {
@@ -25,7 +25,10 @@ export const templateSchema: JSONSchema7 = {
   type: 'object',
   properties: {
     name: { type: 'string' },
-    category: { type: 'string', enum: ['AUTHENTICATION', 'MARKETING', 'UTILITY'] },
+    category: {
+      type: 'string',
+      enum: ['AUTHENTICATION', 'MARKETING', 'UTILITY'],
+    },
     allowCategoryChange: { type: 'boolean' },
     language: { type: 'string' },
     components: { type: 'array' },

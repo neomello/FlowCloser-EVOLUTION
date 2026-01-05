@@ -7,9 +7,19 @@ import { CacheService } from '@api/services/cache.service';
 import { WAMonitoringService } from '@api/services/monitor.service';
 import { SettingsService } from '@api/services/settings.service';
 import { Events, Integration, wa } from '@api/types/wa.types';
-import { Auth, Chatwoot, ConfigService, HttpServer, WaBusiness } from '@config/env.config';
+import {
+  Auth,
+  Chatwoot,
+  ConfigService,
+  HttpServer,
+  WaBusiness,
+} from '@config/env.config';
 import { Logger } from '@config/logger.config';
-import { BadRequestException, InternalServerErrorException, UnauthorizedException } from '@exceptions';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@exceptions';
 import { delay } from 'baileys';
 import { isArray, isURL } from 'class-validator';
 import EventEmitter2 from 'eventemitter2';
@@ -29,7 +39,7 @@ export class InstanceController {
     private readonly cache: CacheService,
     private readonly chatwootCache: CacheService,
     private readonly baileysCache: CacheService,
-    private readonly providerFiles: ProviderFiles,
+    private readonly providerFiles: ProviderFiles
   ) {}
 
   private readonly logger = new Logger('InstanceController');
@@ -101,7 +111,11 @@ export class InstanceController {
             : instance.connectionStatus?.state || 'unknown',
       };
 
-      if (instanceData.proxyHost && instanceData.proxyPort && instanceData.proxyProtocol) {
+      if (
+        instanceData.proxyHost &&
+        instanceData.proxyPort &&
+        instanceData.proxyProtocol
+      ) {
         const testProxy = await this.proxyService.testProxy({
           host: instanceData.proxyHost,
           port: instanceData.proxyPort,
@@ -144,13 +158,21 @@ export class InstanceController {
         }
         const urlServer = this.configService.get<HttpServer>('SERVER').URL;
         webhookWaBusiness = `${urlServer}/webhook/meta`;
-        accessTokenWaBusiness = this.configService.get<WaBusiness>('WA_BUSINESS').TOKEN_WEBHOOK;
+        accessTokenWaBusiness =
+          this.configService.get<WaBusiness>('WA_BUSINESS').TOKEN_WEBHOOK;
       }
 
-      if (!instanceData.chatwootAccountId || !instanceData.chatwootToken || !instanceData.chatwootUrl) {
+      if (
+        !instanceData.chatwootAccountId ||
+        !instanceData.chatwootToken ||
+        !instanceData.chatwootUrl
+      ) {
         let getQrcode: wa.QrCode;
 
-        if (instanceData.qrcode && instanceData.integration === Integration.WHATSAPP_BAILEYS) {
+        if (
+          instanceData.qrcode &&
+          instanceData.integration === Integration.WHATSAPP_BAILEYS
+        ) {
           await instance.connectToWhatsapp(instanceData.number);
           await delay(5000);
           getQrcode = instance.qrCode;
@@ -201,15 +223,24 @@ export class InstanceController {
         throw new BadRequestException('Invalid "url" property in chatwoot');
       }
 
-      if (instanceData.chatwootSignMsg !== true && instanceData.chatwootSignMsg !== false) {
+      if (
+        instanceData.chatwootSignMsg !== true &&
+        instanceData.chatwootSignMsg !== false
+      ) {
         throw new BadRequestException('signMsg is required');
       }
 
-      if (instanceData.chatwootReopenConversation !== true && instanceData.chatwootReopenConversation !== false) {
+      if (
+        instanceData.chatwootReopenConversation !== true &&
+        instanceData.chatwootReopenConversation !== false
+      ) {
         throw new BadRequestException('reopenConversation is required');
       }
 
-      if (instanceData.chatwootConversationPending !== true && instanceData.chatwootConversationPending !== false) {
+      if (
+        instanceData.chatwootConversationPending !== true &&
+        instanceData.chatwootConversationPending !== false
+      ) {
         throw new BadRequestException('conversationPending is required');
       }
 
@@ -222,14 +253,19 @@ export class InstanceController {
           token: instanceData.chatwootToken,
           url: instanceData.chatwootUrl,
           signMsg: instanceData.chatwootSignMsg || false,
-          nameInbox: instanceData.chatwootNameInbox ?? instance.instanceName.split('-cwId-')[0],
+          nameInbox:
+            instanceData.chatwootNameInbox ??
+            instance.instanceName.split('-cwId-')[0],
           number: instanceData.number,
           reopenConversation: instanceData.chatwootReopenConversation || false,
-          conversationPending: instanceData.chatwootConversationPending || false,
+          conversationPending:
+            instanceData.chatwootConversationPending || false,
           importContacts: instanceData.chatwootImportContacts ?? true,
-          mergeBrazilContacts: instanceData.chatwootMergeBrazilContacts ?? false,
+          mergeBrazilContacts:
+            instanceData.chatwootMergeBrazilContacts ?? false,
           importMessages: instanceData.chatwootImportMessages ?? true,
-          daysLimitImportMessages: instanceData.chatwootDaysLimitImportMessages ?? 60,
+          daysLimitImportMessages:
+            instanceData.chatwootDaysLimitImportMessages ?? 60,
           organization: instanceData.chatwootOrganization,
           logo: instanceData.chatwootLogo,
           autoCreate: instanceData.chatwootAutoCreate !== false,
@@ -265,11 +301,14 @@ export class InstanceController {
           url: instanceData.chatwootUrl,
           signMsg: instanceData.chatwootSignMsg || false,
           reopenConversation: instanceData.chatwootReopenConversation || false,
-          conversationPending: instanceData.chatwootConversationPending || false,
-          mergeBrazilContacts: instanceData.chatwootMergeBrazilContacts ?? false,
+          conversationPending:
+            instanceData.chatwootConversationPending || false,
+          mergeBrazilContacts:
+            instanceData.chatwootMergeBrazilContacts ?? false,
           importContacts: instanceData.chatwootImportContacts ?? true,
           importMessages: instanceData.chatwootImportMessages ?? true,
-          daysLimitImportMessages: instanceData.chatwootDaysLimitImportMessages || 60,
+          daysLimitImportMessages:
+            instanceData.chatwootDaysLimitImportMessages || 60,
           number: instanceData.number,
           nameInbox: instanceData.chatwootNameInbox ?? instance.instanceName,
           webhookUrl: `${urlServer}/chatwoot/webhook/${encodeURIComponent(instance.instanceName)}`,
@@ -277,8 +316,12 @@ export class InstanceController {
       };
     } catch (error) {
       this.waMonitor.deleteInstance(instanceData.instanceName);
-      this.logger.error(isArray(error.message) ? error.message[0] : error.message);
-      throw new BadRequestException(isArray(error.message) ? error.message[0] : error.message);
+      this.logger.error(
+        isArray(error.message) ? error.message[0] : error.message
+      );
+      throw new BadRequestException(
+        isArray(error.message) ? error.message[0] : error.message
+      );
     }
   }
 
@@ -288,7 +331,9 @@ export class InstanceController {
       const state = instance?.connectionStatus?.state;
 
       if (!state) {
-        throw new BadRequestException('The "' + instanceName + '" instance does not exist');
+        throw new BadRequestException(
+          'The "' + instanceName + '" instance does not exist'
+        );
       }
 
       if (state == 'open') {
@@ -325,11 +370,15 @@ export class InstanceController {
       const state = instance?.connectionStatus?.state;
 
       if (!state) {
-        throw new BadRequestException('The "' + instanceName + '" instance does not exist');
+        throw new BadRequestException(
+          'The "' + instanceName + '" instance does not exist'
+        );
       }
 
       if (state === 'close') {
-        throw new BadRequestException('The "' + instanceName + '" instance is not connected');
+        throw new BadRequestException(
+          'The "' + instanceName + '" instance is not connected'
+        );
       }
       this.logger.info(`Restarting instance: ${instanceName}`);
 
@@ -347,7 +396,8 @@ export class InstanceController {
 
       // Fallback for Baileys (uses different mechanism)
       if (state === 'open' || state === 'connecting') {
-        if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED) instance.clearCacheChatwoot();
+        if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED)
+          instance.clearCacheChatwoot();
 
         instance.client?.ws?.close();
         instance.client?.end(new Error('restart'));
@@ -370,12 +420,16 @@ export class InstanceController {
     return {
       instance: {
         instanceName: instanceName,
-        state: this.waMonitor.waInstances[instanceName]?.connectionStatus?.state,
+        state:
+          this.waMonitor.waInstances[instanceName]?.connectionStatus?.state,
       },
     };
   }
 
-  public async fetchInstances({ instanceName, instanceId, number }: InstanceDto, key: string) {
+  public async fetchInstances(
+    { instanceName, instanceId, number }: InstanceDto,
+    key: string
+  ) {
     const env = this.configService.get<Auth>('AUTHENTICATION').API_KEY;
 
     if (env.KEY !== key) {
@@ -405,7 +459,10 @@ export class InstanceController {
     return this.waMonitor.instanceInfo(instanceNames);
   }
 
-  public async setPresence({ instanceName }: InstanceDto, data: SetPresenceDto) {
+  public async setPresence(
+    { instanceName }: InstanceDto,
+    data: SetPresenceDto
+  ) {
     return await this.waMonitor.waInstances[instanceName].setPresence(data);
   }
 
@@ -413,13 +470,19 @@ export class InstanceController {
     const { instance } = await this.connectionState({ instanceName });
 
     if (instance.state === 'close') {
-      throw new BadRequestException('The "' + instanceName + '" instance is not connected');
+      throw new BadRequestException(
+        'The "' + instanceName + '" instance is not connected'
+      );
     }
 
     try {
       await this.waMonitor.waInstances[instanceName]?.logoutInstance();
 
-      return { status: 'SUCCESS', error: false, response: { message: 'Instance logged out' } };
+      return {
+        status: 'SUCCESS',
+        error: false,
+        response: { message: 'Instance logged out' },
+      };
     } catch (error) {
       throw new InternalServerErrorException(error.toString());
     }
@@ -429,7 +492,8 @@ export class InstanceController {
     const { instance } = await this.connectionState({ instanceName });
     try {
       const waInstances = this.waMonitor.waInstances[instanceName];
-      if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED) waInstances?.clearCacheChatwoot();
+      if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED)
+        waInstances?.clearCacheChatwoot();
 
       if (instance.state === 'connecting' || instance.state === 'open') {
         await this.logout({ instanceName });
@@ -445,7 +509,11 @@ export class InstanceController {
       }
 
       this.eventEmitter.emit('remove.instance', instanceName, 'inner');
-      return { status: 'SUCCESS', error: false, response: { message: 'Instance deleted' } };
+      return {
+        status: 'SUCCESS',
+        error: false,
+        response: { message: 'Instance deleted' },
+      };
     } catch (error) {
       throw new BadRequestException(error.toString());
     }

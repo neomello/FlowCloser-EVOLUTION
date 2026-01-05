@@ -9,7 +9,11 @@ import { TriggerOperator, TriggerType } from '@prisma/client';
 import { getConversationMessage } from '@utils/getConversationMessage';
 
 import { BaseChatbotDto } from './base-chatbot.dto';
-import { ChatbotController, ChatbotControllerInterface, EmitData } from './chatbot.controller';
+import {
+  ChatbotController,
+  ChatbotControllerInterface,
+  EmitData,
+} from './chatbot.controller';
 
 // Common settings interface for all chatbot integrations
 export interface ChatbotSettings {
@@ -48,7 +52,10 @@ export interface BaseBotData {
   [key: string]: any;
 }
 
-export abstract class BaseChatbotController<BotType = any, BotData extends BaseChatbotDto = BaseChatbotDto>
+export abstract class BaseChatbotController<
+  BotType = any,
+  BotData extends BaseChatbotDto = BaseChatbotDto,
+>
   extends ChatbotController
   implements ChatbotControllerInterface
 {
@@ -58,7 +65,9 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
 
   // Name of the integration, to be set by the derived class
   protected abstract readonly integrationName: string;
@@ -72,13 +81,16 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
     settings: ChatbotSettings,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ): Promise<void>;
 
   // Method to get the fallback bot ID from settings
   protected abstract getFallbackBotId(settings: any): string | undefined;
 
-  constructor(prismaRepository: PrismaRepository, waMonitor: WAMonitoringService) {
+  constructor(
+    prismaRepository: PrismaRepository,
+    waMonitor: WAMonitoringService
+  ) {
     super(prismaRepository, waMonitor);
 
     this.sessionRepository = this.prismaRepository.integrationSession;
@@ -86,7 +98,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Base create bot implementation
   public async createBot(instance: InstanceDto, data: BotData) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -116,7 +129,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
         },
       });
 
-      if (data.expire === undefined || data.expire === null) data.expire = defaultSettingCheck?.expire;
+      if (data.expire === undefined || data.expire === null)
+        data.expire = defaultSettingCheck?.expire;
       if (data.keywordFinish === undefined || data.keywordFinish === null)
         data.keywordFinish = defaultSettingCheck?.keywordFinish;
       if (data.delayMessage === undefined || data.delayMessage === null)
@@ -127,10 +141,12 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
         data.listeningFromMe = defaultSettingCheck?.listeningFromMe;
       if (data.stopBotFromMe === undefined || data.stopBotFromMe === null)
         data.stopBotFromMe = defaultSettingCheck?.stopBotFromMe;
-      if (data.keepOpen === undefined || data.keepOpen === null) data.keepOpen = defaultSettingCheck?.keepOpen;
+      if (data.keepOpen === undefined || data.keepOpen === null)
+        data.keepOpen = defaultSettingCheck?.keepOpen;
       if (data.debounceTime === undefined || data.debounceTime === null)
         data.debounceTime = defaultSettingCheck?.debounceTime;
-      if (data.ignoreJids === undefined || data.ignoreJids === null) data.ignoreJids = defaultSettingCheck?.ignoreJids;
+      if (data.ignoreJids === undefined || data.ignoreJids === null)
+        data.ignoreJids = defaultSettingCheck?.ignoreJids;
       if (data.splitMessages === undefined || data.splitMessages === null)
         data.splitMessages = defaultSettingCheck?.splitMessages ?? false;
       if (data.timePerChar === undefined || data.timePerChar === null)
@@ -163,7 +179,7 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
     if (checkTriggerAll && data.triggerType === 'all') {
       throw new Error(
-        `You already have a ${this.integrationName} with an "All" trigger, you cannot have more bots while it is active`,
+        `You already have a ${this.integrationName} with an "All" trigger, you cannot have more bots while it is active`
       );
     }
 
@@ -245,7 +261,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Common implementation for findBot
   public async findBot(instance: InstanceDto) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -271,7 +288,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Common implementation for fetchBot
   public async fetchBot(instance: InstanceDto, botId: string) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const bot = await this.botRepository.findUnique({
@@ -293,7 +311,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Common implementation for settings
   public async settings(instance: InstanceDto, data: any) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -373,7 +392,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Common implementation for fetchSettings
   public async fetchSettings(instance: InstanceDto) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -428,7 +448,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Common implementation for changeStatus
   public async changeStatus(instance: InstanceDto, data: any) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -455,7 +476,10 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
           status: status,
           session,
         };
-        this.waMonitor.waInstances[instance.instanceName].sendDataWebhook(Events.TYPEBOT_CHANGE_STATUS, typebotData);
+        this.waMonitor.waInstances[instance.instanceName].sendDataWebhook(
+          Events.TYPEBOT_CHANGE_STATUS,
+          typebotData
+        );
       }
 
       if (status === 'delete') {
@@ -489,7 +513,9 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
           });
         }
 
-        return { bot: { ...instance, bot: { remoteJid: remoteJid, status: status } } };
+        return {
+          bot: { ...instance, bot: { remoteJid: remoteJid, status: status } },
+        };
       } else {
         const session = await this.sessionRepository.updateMany({
           where: {
@@ -517,8 +543,13 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
   }
 
   // Common implementation for fetchSessions
-  public async fetchSessions(instance: InstanceDto, botId: string, remoteJid?: string) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+  public async fetchSessions(
+    instance: InstanceDto,
+    botId: string,
+    remoteJid?: string
+  ) {
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -558,7 +589,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Common implementation for ignoreJid
   public async ignoreJid(instance: InstanceDto, data: IgnoreJidDto) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -582,7 +614,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
       let ignoreJids: any = settings?.ignoreJids || [];
 
       if (data.action === 'add') {
-        if (ignoreJids.includes(data.remoteJid)) return { ignoreJids: ignoreJids };
+        if (ignoreJids.includes(data.remoteJid))
+          return { ignoreJids: ignoreJids };
 
         ignoreJids.push(data.remoteJid);
       } else {
@@ -609,7 +642,8 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
   // Base implementation for updateBot
   public async updateBot(instance: InstanceDto, botId: string, data: BotData) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -649,7 +683,7 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
         if (checkTriggerAll) {
           throw new Error(
-            `You already have a ${this.integrationName} with an "All" trigger, you cannot have more bots while it is active`,
+            `You already have a ${this.integrationName} with an "All" trigger, you cannot have more bots while it is active`
           );
         }
       }
@@ -733,14 +767,21 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
   }
 
   // Abstract method for validating bot-specific duplicates on update
-  protected abstract validateNoDuplicatesOnUpdate(botId: string, instanceId: string, data: BotData): Promise<void>;
+  protected abstract validateNoDuplicatesOnUpdate(
+    botId: string,
+    instanceId: string,
+    data: BotData
+  ): Promise<void>;
 
   // Abstract method for getting additional fields for update
-  protected abstract getAdditionalUpdateFields(data: BotData): Record<string, any>;
+  protected abstract getAdditionalUpdateFields(
+    data: BotData
+  ): Record<string, any>;
 
   // Base implementation for deleteBot
   public async deleteBot(instance: InstanceDto, botId: string) {
-    if (!this.integrationEnabled) throw new BadRequestException(`${this.integrationName} is disabled`);
+    if (!this.integrationEnabled)
+      throw new BadRequestException(`${this.integrationName} is disabled`);
 
     try {
       const instanceId = await this.prismaRepository.instance
@@ -805,7 +846,12 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
       // const integrationType = this.getIntegrationType();
 
       // Find a bot for this message
-      let findBot: any = await this.findBotTrigger(this.botRepository, content, instance, session);
+      let findBot: any = await this.findBotTrigger(
+        this.botRepository,
+        content,
+        instance,
+        session
+      );
 
       // If no bot is found, try to use fallback
       if (!findBot) {
@@ -850,16 +896,26 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
       let timePerChar = findBot.timePerChar;
 
       if (expire === undefined || expire === null) expire = settings.expire;
-      if (keywordFinish === undefined || keywordFinish === null) keywordFinish = settings.keywordFinish;
-      if (delayMessage === undefined || delayMessage === null) delayMessage = settings.delayMessage;
-      if (unknownMessage === undefined || unknownMessage === null) unknownMessage = settings.unknownMessage;
-      if (listeningFromMe === undefined || listeningFromMe === null) listeningFromMe = settings.listeningFromMe;
-      if (stopBotFromMe === undefined || stopBotFromMe === null) stopBotFromMe = settings.stopBotFromMe;
-      if (keepOpen === undefined || keepOpen === null) keepOpen = settings.keepOpen;
-      if (debounceTime === undefined || debounceTime === null) debounceTime = settings.debounceTime;
-      if (ignoreJids === undefined || ignoreJids === null) ignoreJids = settings.ignoreJids;
-      if (splitMessages === undefined || splitMessages === null) splitMessages = settings?.splitMessages ?? false;
-      if (timePerChar === undefined || timePerChar === null) timePerChar = settings?.timePerChar ?? 0;
+      if (keywordFinish === undefined || keywordFinish === null)
+        keywordFinish = settings.keywordFinish;
+      if (delayMessage === undefined || delayMessage === null)
+        delayMessage = settings.delayMessage;
+      if (unknownMessage === undefined || unknownMessage === null)
+        unknownMessage = settings.unknownMessage;
+      if (listeningFromMe === undefined || listeningFromMe === null)
+        listeningFromMe = settings.listeningFromMe;
+      if (stopBotFromMe === undefined || stopBotFromMe === null)
+        stopBotFromMe = settings.stopBotFromMe;
+      if (keepOpen === undefined || keepOpen === null)
+        keepOpen = settings.keepOpen;
+      if (debounceTime === undefined || debounceTime === null)
+        debounceTime = settings.debounceTime;
+      if (ignoreJids === undefined || ignoreJids === null)
+        ignoreJids = settings.ignoreJids;
+      if (splitMessages === undefined || splitMessages === null)
+        splitMessages = settings?.splitMessages ?? false;
+      if (timePerChar === undefined || timePerChar === null)
+        timePerChar = settings?.timePerChar ?? 0;
 
       const key = msg.key as {
         id: string;
@@ -885,7 +941,10 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
             status: 'paused',
             session,
           };
-          this.waMonitor.waInstances[instance.instanceName].sendDataWebhook(Events.TYPEBOT_CHANGE_STATUS, typebotData);
+          this.waMonitor.waInstances[instance.instanceName].sendDataWebhook(
+            Events.TYPEBOT_CHANGE_STATUS,
+            typebotData
+          );
         }
 
         return;
@@ -919,18 +978,24 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
 
       // Process with debounce if needed
       if (debounceTime && debounceTime > 0) {
-        this.processDebounce(this.userMessageDebounce, content, remoteJid, debounceTime, async (debouncedContent) => {
-          await this.processBot(
-            this.waMonitor.waInstances[instance.instanceName],
-            remoteJid,
-            findBot,
-            session,
-            mergedSettings,
-            debouncedContent,
-            msg?.pushName,
-            msg,
-          );
-        });
+        this.processDebounce(
+          this.userMessageDebounce,
+          content,
+          remoteJid,
+          debounceTime,
+          async (debouncedContent) => {
+            await this.processBot(
+              this.waMonitor.waInstances[instance.instanceName],
+              remoteJid,
+              findBot,
+              session,
+              mergedSettings,
+              debouncedContent,
+              msg?.pushName,
+              msg
+            );
+          }
+        );
       } else {
         await this.processBot(
           this.waMonitor.waInstances[instance.instanceName],
@@ -940,7 +1005,7 @@ export abstract class BaseChatbotController<BotType = any, BotData extends BaseC
           mergedSettings,
           content,
           msg?.pushName,
-          msg,
+          msg
         );
       }
     } catch (error) {

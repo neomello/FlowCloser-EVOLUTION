@@ -8,7 +8,7 @@ const isNotEmpty = (...propertyNames: string[]): JSONSchema7 => {
       (properties[property] = {
         minLength: 1,
         description: `The "${property}" cannot be empty`,
-      }),
+      })
   );
   return {
     if: {
@@ -33,6 +33,20 @@ export const settingsSchema: JSONSchema7 = {
     syncFullHistory: { type: 'boolean' },
     wavoipToken: { type: 'string' },
   },
-  required: ['rejectCall', 'groupsIgnore', 'alwaysOnline', 'readMessages', 'readStatus', 'syncFullHistory'],
-  ...isNotEmpty('rejectCall', 'groupsIgnore', 'alwaysOnline', 'readMessages', 'readStatus', 'syncFullHistory'),
+  required: [
+    'rejectCall',
+    'groupsIgnore',
+    'alwaysOnline',
+    'readMessages',
+    'readStatus',
+    'syncFullHistory',
+  ],
+  ...isNotEmpty(
+    'rejectCall',
+    'groupsIgnore',
+    'alwaysOnline',
+    'readMessages',
+    'readStatus',
+    'syncFullHistory'
+  ),
 };

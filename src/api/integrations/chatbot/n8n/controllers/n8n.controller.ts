@@ -14,7 +14,7 @@ export class N8nController extends BaseChatbotController<N8nModel, N8nDto> {
   constructor(
     private readonly n8nService: N8nService,
     prismaRepository: PrismaRepository,
-    waMonitor: WAMonitoringService,
+    waMonitor: WAMonitoringService
   ) {
     super(prismaRepository, waMonitor);
 
@@ -30,7 +30,9 @@ export class N8nController extends BaseChatbotController<N8nModel, N8nDto> {
   botRepository: any;
   settingsRepository: any;
   sessionRepository: any;
-  userMessageDebounce: { [key: string]: { message: string; timeoutId: NodeJS.Timeout } } = {};
+  userMessageDebounce: {
+    [key: string]: { message: string; timeoutId: NodeJS.Timeout };
+  } = {};
 
   protected getFallbackBotId(settings: any): string | undefined {
     return settings?.fallbackId;
@@ -62,7 +64,11 @@ export class N8nController extends BaseChatbotController<N8nModel, N8nDto> {
   }
 
   // Implementation for bot-specific duplicate validation on update
-  protected async validateNoDuplicatesOnUpdate(botId: string, instanceId: string, data: N8nDto): Promise<void> {
+  protected async validateNoDuplicatesOnUpdate(
+    botId: string,
+    instanceId: string,
+    data: N8nDto
+  ): Promise<void> {
     const checkDuplicate = await this.botRepository.findFirst({
       where: {
         id: {
@@ -82,7 +88,8 @@ export class N8nController extends BaseChatbotController<N8nModel, N8nDto> {
 
   // Bots
   public async createBot(instance: InstanceDto, data: N8nDto) {
-    if (!this.integrationEnabled) throw new BadRequestException('N8n is disabled');
+    if (!this.integrationEnabled)
+      throw new BadRequestException('N8n is disabled');
 
     const instanceId = await this.prismaRepository.instance
       .findFirst({
@@ -119,9 +126,18 @@ export class N8nController extends BaseChatbotController<N8nModel, N8nDto> {
     settings: any,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ) {
     // Use the base class pattern instead of calling n8nService.process directly
-    await this.n8nService.process(instance, remoteJid, bot, session, settings, content, pushName, msg);
+    await this.n8nService.process(
+      instance,
+      remoteJid,
+      bot,
+      session,
+      settings,
+      content,
+      pushName,
+      msg
+    );
   }
 }

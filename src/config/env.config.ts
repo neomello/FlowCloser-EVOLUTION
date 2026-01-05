@@ -19,9 +19,24 @@ export type Cors = {
   CREDENTIALS: boolean;
 };
 
-export type LogBaileys = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
+export type LogBaileys =
+  | 'fatal'
+  | 'error'
+  | 'warn'
+  | 'info'
+  | 'debug'
+  | 'trace';
 
-export type LogLevel = 'ERROR' | 'WARN' | 'DEBUG' | 'INFO' | 'LOG' | 'VERBOSE' | 'DARK' | 'WEBHOOKS' | 'WEBSOCKET';
+export type LogLevel =
+  | 'ERROR'
+  | 'WARN'
+  | 'DEBUG'
+  | 'INFO'
+  | 'LOG'
+  | 'VERBOSE'
+  | 'DARK'
+  | 'WEBHOOKS'
+  | 'WEBSOCKET';
 
 export type Log = {
   LEVEL: LogLevel[];
@@ -149,7 +164,11 @@ export type Webhook = {
 };
 export type ConfigSessionPhone = { CLIENT: string; NAME: string };
 export type QrCode = { LIMIT: number; COLOR: string };
-export type Typebot = { ENABLED: boolean; API_VERSION: string; SEND_MEDIA_BASE64: boolean };
+export type Typebot = {
+  ENABLED: boolean;
+  API_VERSION: string;
+  SEND_MEDIA_BASE64: boolean;
+};
 export type Chatwoot = {
   ENABLED: boolean;
   MESSAGE_DELETE: boolean;
@@ -298,7 +317,8 @@ export class ConfigService {
       DATABASE: {
         CONNECTION: {
           URI: process.env.DATABASE_CONNECTION_URI || '',
-          CLIENT_NAME: process.env.DATABASE_CONNECTION_CLIENT_NAME || 'evolution',
+          CLIENT_NAME:
+            process.env.DATABASE_CONNECTION_CLIENT_NAME || 'evolution',
         },
         PROVIDER: process.env.DATABASE_PROVIDER || 'postgresql',
         SAVE_DATA: {
@@ -310,10 +330,13 @@ export class ConfigService {
           HISTORIC: process.env?.DATABASE_SAVE_DATA_HISTORIC === 'true',
           LABELS: process.env?.DATABASE_SAVE_DATA_LABELS === 'true',
           IS_ON_WHATSAPP: process.env?.DATABASE_SAVE_IS_ON_WHATSAPP === 'true',
-          IS_ON_WHATSAPP_DAYS: Number.parseInt(process.env?.DATABASE_SAVE_IS_ON_WHATSAPP_DAYS ?? '7'),
+          IS_ON_WHATSAPP_DAYS: Number.parseInt(
+            process.env?.DATABASE_SAVE_IS_ON_WHATSAPP_DAYS ?? '7'
+          ),
         },
         DELETE_DATA: {
-          LOGICAL_MESSAGE_DELETE: process.env?.DATABASE_DELETE_MESSAGE === 'true',
+          LOGICAL_MESSAGE_DELETE:
+            process.env?.DATABASE_DELETE_MESSAGE === 'true',
         },
       },
       WA_BUSINESS: {
@@ -325,7 +348,17 @@ export class ConfigService {
       LOG: {
         LEVEL:
           (process.env?.LOG_LEVEL?.split(',') as LogLevel[]) ||
-          (['ERROR', 'WARN', 'DEBUG', 'INFO', 'LOG', 'VERBOSE', 'DARK', 'WEBHOOKS', 'WEBSOCKET'] as LogLevel[]),
+          ([
+            'ERROR',
+            'WARN',
+            'DEBUG',
+            'INFO',
+            'LOG',
+            'VERBOSE',
+            'DARK',
+            'WEBHOOKS',
+            'WEBSOCKET',
+          ] as LogLevel[]),
         COLOR: process.env?.LOG_COLOR === 'true',
         BAILEYS: (process.env?.LOG_BAILEYS as LogBaileys) || 'error',
       },
@@ -340,52 +373,77 @@ export class ConfigService {
         GLOBAL: {
           URL: process.env?.WEBHOOK_GLOBAL_URL || '',
           ENABLED: process.env?.WEBHOOK_GLOBAL_ENABLED === 'true',
-          WEBHOOK_BY_EVENTS: process.env?.WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS === 'true',
+          WEBHOOK_BY_EVENTS:
+            process.env?.WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS === 'true',
         },
         EVENTS: {
-          APPLICATION_STARTUP: process.env?.WEBHOOK_EVENTS_APPLICATION_STARTUP === 'true',
-          INSTANCE_CREATE: process.env?.WEBHOOK_EVENTS_INSTANCE_CREATE === 'true',
-          INSTANCE_DELETE: process.env?.WEBHOOK_EVENTS_INSTANCE_DELETE === 'true',
+          APPLICATION_STARTUP:
+            process.env?.WEBHOOK_EVENTS_APPLICATION_STARTUP === 'true',
+          INSTANCE_CREATE:
+            process.env?.WEBHOOK_EVENTS_INSTANCE_CREATE === 'true',
+          INSTANCE_DELETE:
+            process.env?.WEBHOOK_EVENTS_INSTANCE_DELETE === 'true',
           QRCODE_UPDATED: process.env?.WEBHOOK_EVENTS_QRCODE_UPDATED === 'true',
           MESSAGES_SET: process.env?.WEBHOOK_EVENTS_MESSAGES_SET === 'true',
-          MESSAGES_UPSERT: process.env?.WEBHOOK_EVENTS_MESSAGES_UPSERT === 'true',
-          MESSAGES_EDITED: process.env?.WEBHOOK_EVENTS_MESSAGES_EDITED === 'true',
-          MESSAGES_UPDATE: process.env?.WEBHOOK_EVENTS_MESSAGES_UPDATE === 'true',
-          MESSAGES_DELETE: process.env?.WEBHOOK_EVENTS_MESSAGES_DELETE === 'true',
+          MESSAGES_UPSERT:
+            process.env?.WEBHOOK_EVENTS_MESSAGES_UPSERT === 'true',
+          MESSAGES_EDITED:
+            process.env?.WEBHOOK_EVENTS_MESSAGES_EDITED === 'true',
+          MESSAGES_UPDATE:
+            process.env?.WEBHOOK_EVENTS_MESSAGES_UPDATE === 'true',
+          MESSAGES_DELETE:
+            process.env?.WEBHOOK_EVENTS_MESSAGES_DELETE === 'true',
           SEND_MESSAGE: process.env?.WEBHOOK_EVENTS_SEND_MESSAGE === 'true',
-          SEND_MESSAGE_UPDATE: process.env?.WEBHOOK_EVENTS_SEND_MESSAGE_UPDATE === 'true',
+          SEND_MESSAGE_UPDATE:
+            process.env?.WEBHOOK_EVENTS_SEND_MESSAGE_UPDATE === 'true',
           CONTACTS_SET: process.env?.WEBHOOK_EVENTS_CONTACTS_SET === 'true',
-          CONTACTS_UPDATE: process.env?.WEBHOOK_EVENTS_CONTACTS_UPDATE === 'true',
-          CONTACTS_UPSERT: process.env?.WEBHOOK_EVENTS_CONTACTS_UPSERT === 'true',
-          PRESENCE_UPDATE: process.env?.WEBHOOK_EVENTS_PRESENCE_UPDATE === 'true',
+          CONTACTS_UPDATE:
+            process.env?.WEBHOOK_EVENTS_CONTACTS_UPDATE === 'true',
+          CONTACTS_UPSERT:
+            process.env?.WEBHOOK_EVENTS_CONTACTS_UPSERT === 'true',
+          PRESENCE_UPDATE:
+            process.env?.WEBHOOK_EVENTS_PRESENCE_UPDATE === 'true',
           CHATS_SET: process.env?.WEBHOOK_EVENTS_CHATS_SET === 'true',
           CHATS_UPDATE: process.env?.WEBHOOK_EVENTS_CHATS_UPDATE === 'true',
           CHATS_UPSERT: process.env?.WEBHOOK_EVENTS_CHATS_UPSERT === 'true',
           CHATS_DELETE: process.env?.WEBHOOK_EVENTS_CHATS_DELETE === 'true',
-          CONNECTION_UPDATE: process.env?.WEBHOOK_EVENTS_CONNECTION_UPDATE === 'true',
+          CONNECTION_UPDATE:
+            process.env?.WEBHOOK_EVENTS_CONNECTION_UPDATE === 'true',
           LABELS_EDIT: process.env?.WEBHOOK_EVENTS_LABELS_EDIT === 'true',
-          LABELS_ASSOCIATION: process.env?.WEBHOOK_EVENTS_LABELS_ASSOCIATION === 'true',
+          LABELS_ASSOCIATION:
+            process.env?.WEBHOOK_EVENTS_LABELS_ASSOCIATION === 'true',
           GROUPS_UPSERT: process.env?.WEBHOOK_EVENTS_GROUPS_UPSERT === 'true',
           GROUP_UPDATE: process.env?.WEBHOOK_EVENTS_GROUPS_UPDATE === 'true',
-          GROUP_PARTICIPANTS_UPDATE: process.env?.WEBHOOK_EVENTS_GROUP_PARTICIPANTS_UPDATE === 'true',
+          GROUP_PARTICIPANTS_UPDATE:
+            process.env?.WEBHOOK_EVENTS_GROUP_PARTICIPANTS_UPDATE === 'true',
           CALL: process.env?.WEBHOOK_EVENTS_CALL === 'true',
           TYPEBOT_START: process.env?.WEBHOOK_EVENTS_TYPEBOT_START === 'true',
-          TYPEBOT_CHANGE_STATUS: process.env?.WEBHOOK_EVENTS_TYPEBOT_CHANGE_STATUS === 'true',
+          TYPEBOT_CHANGE_STATUS:
+            process.env?.WEBHOOK_EVENTS_TYPEBOT_CHANGE_STATUS === 'true',
           ERRORS: process.env?.WEBHOOK_EVENTS_ERRORS === 'true',
           ERRORS_WEBHOOK: process.env?.WEBHOOK_EVENTS_ERRORS_WEBHOOK || '',
         },
         REQUEST: {
-          TIMEOUT_MS: Number.parseInt(process.env?.WEBHOOK_REQUEST_TIMEOUT_MS) || 30000,
+          TIMEOUT_MS:
+            Number.parseInt(process.env?.WEBHOOK_REQUEST_TIMEOUT_MS) || 30000,
         },
         RETRY: {
-          MAX_ATTEMPTS: Number.parseInt(process.env?.WEBHOOK_RETRY_MAX_ATTEMPTS) || 10,
-          INITIAL_DELAY_SECONDS: Number.parseInt(process.env?.WEBHOOK_RETRY_INITIAL_DELAY_SECONDS) || 5,
-          USE_EXPONENTIAL_BACKOFF: process.env?.WEBHOOK_RETRY_USE_EXPONENTIAL_BACKOFF !== 'false',
-          MAX_DELAY_SECONDS: Number.parseInt(process.env?.WEBHOOK_RETRY_MAX_DELAY_SECONDS) || 300,
-          JITTER_FACTOR: Number.parseFloat(process.env?.WEBHOOK_RETRY_JITTER_FACTOR) || 0.2,
-          NON_RETRYABLE_STATUS_CODES: process.env?.WEBHOOK_RETRY_NON_RETRYABLE_STATUS_CODES?.split(',').map(Number) || [
-            400, 401, 403, 404, 422,
-          ],
+          MAX_ATTEMPTS:
+            Number.parseInt(process.env?.WEBHOOK_RETRY_MAX_ATTEMPTS) || 10,
+          INITIAL_DELAY_SECONDS:
+            Number.parseInt(process.env?.WEBHOOK_RETRY_INITIAL_DELAY_SECONDS) ||
+            5,
+          USE_EXPONENTIAL_BACKOFF:
+            process.env?.WEBHOOK_RETRY_USE_EXPONENTIAL_BACKOFF !== 'false',
+          MAX_DELAY_SECONDS:
+            Number.parseInt(process.env?.WEBHOOK_RETRY_MAX_DELAY_SECONDS) ||
+            300,
+          JITTER_FACTOR:
+            Number.parseFloat(process.env?.WEBHOOK_RETRY_JITTER_FACTOR) || 0.2,
+          NON_RETRYABLE_STATUS_CODES:
+            process.env?.WEBHOOK_RETRY_NON_RETRYABLE_STATUS_CODES?.split(
+              ','
+            ).map(Number) || [400, 401, 403, 404, 422],
         },
       },
       CONFIG_SESSION_PHONE: {
@@ -405,14 +463,17 @@ export class ConfigService {
         ENABLED: process.env?.CHATWOOT_ENABLED === 'true',
         MESSAGE_DELETE: process.env.CHATWOOT_MESSAGE_DELETE === 'true',
         MESSAGE_READ: process.env.CHATWOOT_MESSAGE_READ === 'true',
-        BOT_CONTACT: !process.env.CHATWOOT_BOT_CONTACT || process.env.CHATWOOT_BOT_CONTACT === 'true',
+        BOT_CONTACT:
+          !process.env.CHATWOOT_BOT_CONTACT ||
+          process.env.CHATWOOT_BOT_CONTACT === 'true',
         IMPORT: {
           DATABASE: {
             CONNECTION: {
               URI: process.env.CHATWOOT_IMPORT_DATABASE_CONNECTION_URI || '',
             },
           },
-          PLACEHOLDER_MEDIA_MESSAGE: process.env?.CHATWOOT_IMPORT_PLACEHOLDER_MEDIA_MESSAGE === 'true',
+          PLACEHOLDER_MEDIA_MESSAGE:
+            process.env?.CHATWOOT_IMPORT_PLACEHOLDER_MEDIA_MESSAGE === 'true',
         },
       },
       OPENAI: {
@@ -448,7 +509,8 @@ export class ConfigService {
         API_KEY: {
           KEY: process.env.AUTHENTICATION_API_KEY || 'BQYHJGJHJ',
         },
-        EXPOSE_IN_FETCH_INSTANCES: process.env?.AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES === 'true',
+        EXPOSE_IN_FETCH_INSTANCES:
+          process.env?.AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES === 'true',
       },
       METRICS: {
         ENABLED: process.env?.PROMETHEUS_METRICS === 'true',
@@ -458,7 +520,9 @@ export class ConfigService {
         ALLOWED_IPS: process.env?.METRICS_ALLOWED_IPS,
       },
       TELEMETRY: {
-        ENABLED: process.env?.TELEMETRY_ENABLED === undefined || process.env?.TELEMETRY_ENABLED === 'true',
+        ENABLED:
+          process.env?.TELEMETRY_ENABLED === undefined ||
+          process.env?.TELEMETRY_ENABLED === 'true',
         URL: process.env?.TELEMETRY_URL,
       },
       PROXY: {
@@ -481,7 +545,8 @@ export class ConfigService {
         DSN: process.env?.SENTRY_DSN,
       },
       EVENT_EMITTER: {
-        MAX_LISTENERS: Number.parseInt(process.env?.EVENT_EMITTER_MAX_LISTENERS) || 50,
+        MAX_LISTENERS:
+          Number.parseInt(process.env?.EVENT_EMITTER_MAX_LISTENERS) || 50,
       },
     };
   }

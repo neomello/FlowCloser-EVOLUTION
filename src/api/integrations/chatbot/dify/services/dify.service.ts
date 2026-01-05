@@ -16,7 +16,7 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
     waMonitor: WAMonitoringService,
     prismaRepository: PrismaRepository,
     configService: ConfigService,
-    openaiService: OpenaiService,
+    openaiService: OpenaiService
   ) {
     super(waMonitor, prismaRepository, 'DifyService', configService);
     this.openaiService = openaiService;
@@ -37,7 +37,7 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
     remoteJid: string,
     pushName: string,
     content: string,
-    msg?: any,
+    msg?: any
   ): Promise<void> {
     try {
       let endpoint: string = dify.apiUrl;
@@ -51,8 +51,13 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
       let processedContent = content;
       if (this.isAudioMessage(content) && msg) {
         try {
-          this.logger.debug(`[Dify] Downloading audio for Whisper transcription`);
-          const transcription = await this.openaiService.speechToText(msg, instance);
+          this.logger.debug(
+            `[Dify] Downloading audio for Whisper transcription`
+          );
+          const transcription = await this.openaiService.speechToText(
+            msg,
+            instance
+          );
           if (transcription) {
             processedContent = `[audio] ${transcription}`;
           }
@@ -73,7 +78,8 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           },
           query: processedContent,
           response_mode: 'blocking',
-          conversation_id: session.sessionId === remoteJid ? undefined : session.sessionId,
+          conversation_id:
+            session.sessionId === remoteJid ? undefined : session.sessionId,
           user: remoteJid,
         };
 
@@ -85,7 +91,9 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
             let mediaBase64 = msg.message.base64 || null;
 
             if (msg.message.mediaUrl && isURL(msg.message.mediaUrl)) {
-              const result = await axios.get(msg.message.mediaUrl, { responseType: 'arraybuffer' });
+              const result = await axios.get(msg.message.mediaUrl, {
+                responseType: 'arraybuffer',
+              });
               mediaBase64 = Buffer.from(result.data).toString('base64');
             }
 
@@ -128,7 +136,13 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
         const conversationId = response?.data?.conversation_id;
 
         if (message) {
-          await this.sendMessageWhatsApp(instance, remoteJid, message, settings, true);
+          await this.sendMessageWhatsApp(
+            instance,
+            remoteJid,
+            message,
+            settings,
+            true
+          );
         }
 
         await this.prismaRepository.integrationSession.update({
@@ -138,7 +152,10 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           data: {
             status: 'opened',
             awaitUser: true,
-            sessionId: session.sessionId === remoteJid ? conversationId : session.sessionId,
+            sessionId:
+              session.sessionId === remoteJid
+                ? conversationId
+                : session.sessionId,
           },
         });
       }
@@ -155,7 +172,8 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
             apiKey: instance.token,
           },
           response_mode: 'blocking',
-          conversation_id: session.sessionId === remoteJid ? undefined : session.sessionId,
+          conversation_id:
+            session.sessionId === remoteJid ? undefined : session.sessionId,
           user: remoteJid,
         };
 
@@ -167,7 +185,9 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
             let mediaBase64 = msg.message.base64 || null;
 
             if (msg.message.mediaUrl && isURL(msg.message.mediaUrl)) {
-              const result = await axios.get(msg.message.mediaUrl, { responseType: 'arraybuffer' });
+              const result = await axios.get(msg.message.mediaUrl, {
+                responseType: 'arraybuffer',
+              });
               mediaBase64 = Buffer.from(result.data).toString('base64');
             }
 
@@ -210,7 +230,13 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
         const conversationId = response?.data?.conversation_id;
 
         if (message) {
-          await this.sendMessageWhatsApp(instance, remoteJid, message, settings, true);
+          await this.sendMessageWhatsApp(
+            instance,
+            remoteJid,
+            message,
+            settings,
+            true
+          );
         }
 
         await this.prismaRepository.integrationSession.update({
@@ -220,7 +246,10 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           data: {
             status: 'opened',
             awaitUser: true,
-            sessionId: session.sessionId === remoteJid ? conversationId : session.sessionId,
+            sessionId:
+              session.sessionId === remoteJid
+                ? conversationId
+                : session.sessionId,
           },
         });
       }
@@ -237,7 +266,8 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           },
           query: processedContent,
           response_mode: 'streaming',
-          conversation_id: session.sessionId === remoteJid ? undefined : session.sessionId,
+          conversation_id:
+            session.sessionId === remoteJid ? undefined : session.sessionId,
           user: remoteJid,
         };
 
@@ -298,7 +328,13 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           await instance.client.sendPresenceUpdate('paused', remoteJid);
 
         if (answer) {
-          await this.sendMessageWhatsApp(instance, remoteJid, answer, settings, true);
+          await this.sendMessageWhatsApp(
+            instance,
+            remoteJid,
+            answer,
+            settings,
+            true
+          );
         }
 
         await this.prismaRepository.integrationSession.update({
@@ -308,7 +344,10 @@ export class DifyService extends BaseChatbotService<Dify, DifySetting> {
           data: {
             status: 'opened',
             awaitUser: true,
-            sessionId: session.sessionId === remoteJid ? conversationId : session.sessionId,
+            sessionId:
+              session.sessionId === remoteJid
+                ? conversationId
+                : session.sessionId,
           },
         });
       }

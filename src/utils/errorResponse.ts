@@ -21,11 +21,16 @@ export interface MetaErrorResponse {
 /**
  * Creates standardized error response for Meta/WhatsApp API errors
  */
-export function createMetaErrorResponse(error: any, context: string): MetaErrorResponse {
+export function createMetaErrorResponse(
+  error: any,
+  context: string
+): MetaErrorResponse {
   // Extract Meta/WhatsApp specific error fields
   const metaError = error.template || error;
-  const errorUserTitle = metaError.error_user_title || metaError.message || 'Unknown error';
-  const errorUserMsg = metaError.error_user_msg || metaError.message || 'Unknown error';
+  const errorUserTitle =
+    metaError.error_user_title || metaError.message || 'Unknown error';
+  const errorUserMsg =
+    metaError.error_user_msg || metaError.message || 'Unknown error';
 
   return {
     status: HttpStatus.BAD_REQUEST,

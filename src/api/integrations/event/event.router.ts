@@ -7,6 +7,9 @@ export class EventRouter {
   constructor(configService: any, ...guards: any[]) {
     this.router = Router();
 
-    this.router.use('/webhook', new WebhookRouter(configService, ...guards).router);
+    this.router.use(
+      '/webhook',
+      new WebhookRouter(configService, ...guards).router
+    );
   }
 }

@@ -36,7 +36,14 @@
 
 import { ProviderFiles } from '@api/provider/sessions';
 import { Logger } from '@config/logger.config';
-import { AuthenticationCreds, AuthenticationState, BufferJSON, initAuthCreds, proto, SignalDataTypeMap } from 'baileys';
+import {
+  AuthenticationCreds,
+  AuthenticationState,
+  BufferJSON,
+  initAuthCreds,
+  proto,
+  SignalDataTypeMap,
+} from 'baileys';
 import { isNotEmpty } from 'class-validator';
 
 export type AuthState = {
@@ -53,7 +60,11 @@ export class AuthStateProvider {
   public async authStateProvider(instance: string): Promise<AuthState> {
     const [, error] = await this.providerFiles.create(instance);
     if (error) {
-      this.logger.error(['Failed to create folder on file server', error?.message, error?.stack]);
+      this.logger.error([
+        'Failed to create folder on file server',
+        error?.message,
+        error?.stack,
+      ]);
       return;
     }
 
@@ -91,7 +102,8 @@ export class AuthStateProvider {
     };
 
     const removeCreds = async () => {
-      const [response, error] = await this.providerFiles.removeSession(instance);
+      const [response, error] =
+        await this.providerFiles.removeSession(instance);
       if (error) {
         // this.logger.error(['removeData', error?.message, error?.stack]);
         return;
@@ -102,7 +114,8 @@ export class AuthStateProvider {
       return;
     };
 
-    const creds: AuthenticationCreds = (await readData('creds')) || initAuthCreds();
+    const creds: AuthenticationCreds =
+      (await readData('creds')) || initAuthCreds();
 
     return {
       state: {
@@ -120,7 +133,7 @@ export class AuthStateProvider {
                 }
 
                 data[id] = value;
-              }),
+              })
             );
 
             return data;
@@ -131,7 +144,9 @@ export class AuthStateProvider {
               for (const id in data[category]) {
                 const value = data[category][id];
                 const key = `${category}-${id}`;
-                tasks.push(value ? await writeData(value, key) : await removeData(key));
+                tasks.push(
+                  value ? await writeData(value, key) : await removeData(key)
+                );
               }
             }
 

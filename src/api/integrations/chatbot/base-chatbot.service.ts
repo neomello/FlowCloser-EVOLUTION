@@ -20,7 +20,7 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     waMonitor: WAMonitoringService,
     prismaRepository: PrismaRepository,
     loggerName: string,
-    configService?: ConfigService,
+    configService?: ConfigService
   ) {
     this.waMonitor = waMonitor;
     this.prismaRepository = prismaRepository;
@@ -62,7 +62,16 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
     const audioExtensions = ['mp3', 'wav', 'aac', 'ogg'];
     const videoExtensions = ['mp4', 'avi', 'mkv', 'mov'];
-    const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'];
+    const documentExtensions = [
+      'pdf',
+      'doc',
+      'docx',
+      'xls',
+      'xlsx',
+      'ppt',
+      'pptx',
+      'txt',
+    ];
 
     if (imageExtensions.includes(extension || '')) return 'image';
     if (audioExtensions.includes(extension || '')) return 'audio';
@@ -74,7 +83,11 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
   /**
    * Create a new chatbot session
    */
-  public async createNewSession(instance: InstanceDto | any, data: any, type: string) {
+  public async createNewSession(
+    instance: InstanceDto | any,
+    data: any,
+    type: string
+  ) {
     try {
       // Extract pushName safely - if data.pushName is an object with a pushName property, use that
       const pushNameValue =
@@ -86,7 +99,9 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
 
       // Extract remoteJid safely
       const remoteJidValue =
-        typeof data.remoteJid === 'object' && data.remoteJid?.remoteJid ? data.remoteJid.remoteJid : data.remoteJid;
+        typeof data.remoteJid === 'object' && data.remoteJid?.remoteJid
+          ? data.remoteJid.remoteJid
+          : data.remoteJid;
 
       const session = await this.prismaRepository.integrationSession.create({
         data: {
@@ -122,12 +137,21 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     settings: SettingsType,
     content: string,
     pushName?: string,
-    msg?: any,
+    msg?: any
   ): Promise<void> {
     try {
       // For new sessions or sessions awaiting initialization
       if (!session) {
-        await this.initNewSession(instance, remoteJid, bot, settings, session, content, pushName, msg);
+        await this.initNewSession(
+          instance,
+          remoteJid,
+          bot,
+          settings,
+          session,
+          content,
+          pushName,
+          msg
+        );
         return;
       }
 
@@ -139,7 +163,10 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
       // For existing sessions, keywords might indicate the conversation should end
       const keywordFinish = (settings as any)?.keywordFinish || '';
       const normalizedContent = content.toLowerCase().trim();
-      if (keywordFinish.length > 0 && normalizedContent === keywordFinish.toLowerCase()) {
+      if (
+        keywordFinish.length > 0 &&
+        normalizedContent === keywordFinish.toLowerCase()
+      ) {
         // Update session to closed and return
         await this.prismaRepository.integrationSession.update({
           where: {
@@ -153,7 +180,16 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
       }
 
       // Forward the message to the chatbot API
-      await this.sendMessageToBot(instance, session, settings, bot, remoteJid, pushName || '', content, msg);
+      await this.sendMessageToBot(
+        instance,
+        session,
+        settings,
+        bot,
+        remoteJid,
+        pushName || '',
+        content,
+        msg
+      );
 
       // Update session to indicate we're waiting for user response
       await this.prismaRepository.integrationSession.update({
@@ -180,7 +216,7 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     remoteJid: string,
     message: string,
     settings: SettingsType,
-    linkPreview: boolean = true,
+    linkPreview: boolean = true
   ): Promise<void> {
     if (!message) return;
 
@@ -203,7 +239,14 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
       if (mediaType) {
         // Send accumulated text before sending media
         if (textBuffer.trim()) {
-          await this.sendFormattedText(instance, remoteJid, textBuffer.trim(), settings, splitMessages, linkPreview);
+          await this.sendFormattedText(
+            instance,
+            remoteJid,
+            textBuffer.trim(),
+            settings,
+            splitMessages,
+            linkPreview
+          );
           textBuffer = '';
         }
 
@@ -211,7 +254,9 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
         try {
           if (mediaType === 'audio') {
             await instance.audioWhatsapp({
-              number: remoteJid.includes('@lid') ? remoteJid : remoteJid.split('@')[0],
+              number: remoteJid.includes('@lid')
+                ? remoteJid
+                : remoteJid.split('@')[0],
               delay: (settings as any)?.delayMessage || 1000,
               audio: url,
               caption: altText,
@@ -219,15 +264,18 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
           } else {
             await instance.mediaMessage(
               {
-                number: remoteJid.includes('@lid') ? remoteJid : remoteJid.split('@')[0],
+                number: remoteJid.includes('@lid')
+                  ? remoteJid
+                  : remoteJid.split('@')[0],
                 delay: (settings as any)?.delayMessage || 1000,
                 mediatype: mediaType,
                 media: url,
                 caption: altText,
-                fileName: mediaType === 'document' ? altText || 'document' : undefined,
+                fileName:
+                  mediaType === 'document' ? altText || 'document' : undefined,
               },
               null,
-              false,
+              false
             );
           }
         } catch (error) {
@@ -253,7 +301,14 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
 
     // Send any remaining text
     if (textBuffer.trim()) {
-      await this.sendFormattedText(instance, remoteJid, textBuffer.trim(), settings, splitMessages, linkPreview);
+      await this.sendFormattedText(
+        instance,
+        remoteJid,
+        textBuffer.trim(),
+        settings,
+        splitMessages,
+        linkPreview
+      );
     }
   }
 
@@ -272,14 +327,19 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     remoteJid: string,
     message: string,
     settings: any,
-    linkPreview: boolean = true,
+    linkPreview: boolean = true
   ): Promise<void> {
     const timePerChar = settings?.timePerChar ?? 0;
     const minDelay = 1000;
     const maxDelay = 20000;
-    const delay = Math.min(Math.max(message.length * timePerChar, minDelay), maxDelay);
+    const delay = Math.min(
+      Math.max(message.length * timePerChar, minDelay),
+      maxDelay
+    );
 
-    this.logger.debug(`[BaseChatbot] Sending single message with linkPreview: ${linkPreview}`);
+    this.logger.debug(
+      `[BaseChatbot] Sending single message with linkPreview: ${linkPreview}`
+    );
 
     if (instance.integration === Integration.WHATSAPP_BAILEYS) {
       await instance.client.presenceSubscribe(remoteJid);
@@ -290,12 +350,14 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
       setTimeout(async () => {
         await instance.textMessage(
           {
-            number: remoteJid.includes('@lid') ? remoteJid : remoteJid.split('@')[0],
+            number: remoteJid.includes('@lid')
+              ? remoteJid
+              : remoteJid.split('@')[0],
             delay: settings?.delayMessage || 1000,
             text: message,
             linkPreview,
           },
-          false,
+          false
         );
         resolve();
       }, delay);
@@ -315,24 +377,40 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     text: string,
     settings: any,
     splitMessages: boolean,
-    linkPreview: boolean = true,
+    linkPreview: boolean = true
   ): Promise<void> {
     if (splitMessages) {
       const messageParts = this.splitMessageByDoubleLineBreaks(text);
 
-      this.logger.debug(`[BaseChatbot] Splitting message into ${messageParts.length} parts`);
+      this.logger.debug(
+        `[BaseChatbot] Splitting message into ${messageParts.length} parts`
+      );
 
       for (let index = 0; index < messageParts.length; index++) {
         const message = messageParts[index];
 
-        this.logger.debug(`[BaseChatbot] Sending message part ${index + 1}/${messageParts.length}`);
-        await this.sendSingleMessage(instance, remoteJid, message, settings, linkPreview);
+        this.logger.debug(
+          `[BaseChatbot] Sending message part ${index + 1}/${messageParts.length}`
+        );
+        await this.sendSingleMessage(
+          instance,
+          remoteJid,
+          message,
+          settings,
+          linkPreview
+        );
       }
 
       this.logger.debug(`[BaseChatbot] All message parts sent successfully`);
     } else {
       this.logger.debug(`[BaseChatbot] Sending single message`);
-      await this.sendSingleMessage(instance, remoteJid, text, settings, linkPreview);
+      await this.sendSingleMessage(
+        instance,
+        remoteJid,
+        text,
+        settings,
+        linkPreview
+      );
     }
   }
 
@@ -348,7 +426,7 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     session: IntegrationSession,
     content: string,
     pushName?: string | any,
-    msg?: any,
+    msg?: any
   ): Promise<void> {
     // Create a session if none exists
     if (!session) {
@@ -370,7 +448,7 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
           pushName: pushNameValue,
           botId: (bot as any).id,
         },
-        this.getBotType(),
+        this.getBotType()
       );
 
       if (!sessionResult || !sessionResult.session) {
@@ -393,7 +471,16 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     });
 
     // Forward the message to the chatbot
-    await this.sendMessageToBot(instance, session, settings, bot, remoteJid, pushName || '', content, msg);
+    await this.sendMessageToBot(
+      instance,
+      session,
+      settings,
+      bot,
+      remoteJid,
+      pushName || '',
+      content,
+      msg
+    );
   }
 
   /**
@@ -414,6 +501,6 @@ export abstract class BaseChatbotService<BotType = any, SettingsType = any> {
     remoteJid: string,
     pushName: string,
     content: string,
-    msg?: any,
+    msg?: any
   ): Promise<void>;
 }

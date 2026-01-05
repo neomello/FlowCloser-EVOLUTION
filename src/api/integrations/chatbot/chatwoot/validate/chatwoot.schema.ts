@@ -8,7 +8,7 @@ const isNotEmpty = (...propertyNames: string[]): JSONSchema7 => {
       (properties[property] = {
         minLength: 1,
         description: `The "${property}" cannot be empty`,
-      }),
+      })
   );
   return {
     if: {
@@ -40,6 +40,22 @@ export const chatwootSchema: JSONSchema7 = {
     daysLimitImportMessages: { type: 'number' },
     ignoreJids: { type: 'array', items: { type: 'string' } },
   },
-  required: ['enabled', 'accountId', 'token', 'url', 'signMsg', 'reopenConversation', 'conversationPending'],
-  ...isNotEmpty('enabled', 'accountId', 'token', 'url', 'signMsg', 'reopenConversation', 'conversationPending'),
+  required: [
+    'enabled',
+    'accountId',
+    'token',
+    'url',
+    'signMsg',
+    'reopenConversation',
+    'conversationPending',
+  ],
+  ...isNotEmpty(
+    'enabled',
+    'accountId',
+    'token',
+    'url',
+    'signMsg',
+    'reopenConversation',
+    'conversationPending'
+  ),
 };

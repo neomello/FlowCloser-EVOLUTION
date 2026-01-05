@@ -19,7 +19,8 @@ export class WebhookRouter extends RouterBroker {
           request: req,
           schema: webhookSchema,
           ClassRef: EventDto,
-          execute: (instance, data) => eventManager.webhook.set(instance.instanceName, data),
+          execute: (instance, data) =>
+            eventManager.webhook.set(instance.instanceName, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);
@@ -29,7 +30,8 @@ export class WebhookRouter extends RouterBroker {
           request: req,
           schema: instanceSchema,
           ClassRef: InstanceDto,
-          execute: (instance) => eventManager.webhook.get(instance.instanceName),
+          execute: (instance) =>
+            eventManager.webhook.get(instance.instanceName),
         });
 
         res.status(HttpStatus.OK).json(response);

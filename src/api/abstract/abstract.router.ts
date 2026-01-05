@@ -105,7 +105,10 @@ export abstract class RouterBroker {
       if (request.query?.groupJid) {
         groupJid = request.query.groupJid;
       } else {
-        throw new BadRequestException('The group id needs to be informed in the query', 'ex: "groupJid=120362@g.us"');
+        throw new BadRequestException(
+          'The group id needs to be informed in the query',
+          'ex: "groupJid=120362@g.us"'
+        );
       }
     }
 
@@ -151,7 +154,7 @@ export abstract class RouterBroker {
     if (!inviteCode?.inviteCode) {
       throw new BadRequestException(
         'The group invite code id needs to be informed in the query',
-        'ex: "inviteCode=F1EX5QZxO181L3TMVP31gY" (Obtained from group join link)',
+        'ex: "inviteCode=F1EX5QZxO181L3TMVP31gY" (Obtained from group join link)'
       );
     }
 
@@ -191,7 +194,9 @@ export abstract class RouterBroker {
     const getParticipants = request.query as unknown as GetParticipant;
 
     if (!getParticipants?.getParticipants) {
-      throw new BadRequestException('The getParticipants needs to be informed in the query');
+      throw new BadRequestException(
+        'The getParticipants needs to be informed in the query'
+      );
     }
 
     const instance = request.params as unknown as InstanceDto;

@@ -38,4 +38,3 @@ jobs:
           else
             echo "✅ All headers have blank lines"
           fi
-

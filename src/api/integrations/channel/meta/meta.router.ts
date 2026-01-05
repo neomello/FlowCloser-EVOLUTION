@@ -8,7 +8,10 @@ export class MetaRouter extends RouterBroker {
     super();
     this.router
       .get(this.routerPath('webhook/meta', false), async (req, res) => {
-        if (req.query['hub.verify_token'] === configService.get<WaBusiness>('WA_BUSINESS').TOKEN_WEBHOOK)
+        if (
+          req.query['hub.verify_token'] ===
+          configService.get<WaBusiness>('WA_BUSINESS').TOKEN_WEBHOOK
+        )
           res.send(req.query['hub.challenge']);
         else res.send('Error, wrong validation token');
       })

@@ -16,7 +16,8 @@ export class SettingsRouter extends RouterBroker {
           request: req,
           schema: settingsSchema,
           ClassRef: SettingsDto,
-          execute: (instance, data) => settingsController.createSettings(instance, data),
+          execute: (instance, data) =>
+            settingsController.createSettings(instance, data),
         });
 
         res.status(HttpStatus.CREATED).json(response);

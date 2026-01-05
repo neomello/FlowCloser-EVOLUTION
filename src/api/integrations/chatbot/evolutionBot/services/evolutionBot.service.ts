@@ -3,7 +3,11 @@ import { PrismaRepository } from '@api/repository/repository.service';
 import { WAMonitoringService } from '@api/services/monitor.service';
 import { Integration } from '@api/types/wa.types';
 import { ConfigService, HttpServer } from '@config/env.config';
-import { EvolutionBot, EvolutionBotSetting, IntegrationSession } from '@prisma/client';
+import {
+  EvolutionBot,
+  EvolutionBotSetting,
+  IntegrationSession,
+} from '@prisma/client';
 import { sendTelemetry } from '@utils/sendTelemetry';
 import axios from 'axios';
 import { isURL } from 'class-validator';
@@ -11,14 +15,17 @@ import { isURL } from 'class-validator';
 import { BaseChatbotService } from '../../base-chatbot.service';
 import { OpenaiService } from '../../openai/services/openai.service';
 
-export class EvolutionBotService extends BaseChatbotService<EvolutionBot, EvolutionBotSetting> {
+export class EvolutionBotService extends BaseChatbotService<
+  EvolutionBot,
+  EvolutionBotSetting
+> {
   private openaiService: OpenaiService;
 
   constructor(
     waMonitor: WAMonitoringService,
     prismaRepository: PrismaRepository,
     configService: ConfigService,
-    openaiService: OpenaiService,
+    openaiService: OpenaiService
   ) {
     super(waMonitor, prismaRepository, 'EvolutionBotService', configService);
     this.openaiService = openaiService;
@@ -42,7 +49,7 @@ export class EvolutionBotService extends BaseChatbotService<EvolutionBot, Evolut
     remoteJid: string,
     pushName: string,
     content: string,
-    msg?: any,
+    msg?: any
   ): Promise<void> {
     try {
       const payload: any = {
@@ -56,19 +63,27 @@ export class EvolutionBotService extends BaseChatbotService<EvolutionBot, Evolut
           apiKey: instance.token,
         },
         query: content,
-        conversation_id: session.sessionId === remoteJid ? undefined : session.sessionId,
+        conversation_id:
+          session.sessionId === remoteJid ? undefined : session.sessionId,
         user: remoteJid,
       };
 
       if (this.isAudioMessage(content) && msg) {
         try {
-          this.logger.debug(`[EvolutionBot] Downloading audio for Whisper transcription`);
-          const transcription = await this.openaiService.speechToText(msg, instance);
+          this.logger.debug(
+            `[EvolutionBot] Downloading audio for Whisper transcription`
+          );
+          const transcription = await this.openaiService.speechToText(
+            msg,
+            instance
+          );
           if (transcription) {
             payload.query = `[audio] ${transcription}`;
           }
         } catch (err) {
-          this.logger.error(`[EvolutionBot] Failed to transcribe audio: ${err}`);
+          this.logger.error(
+            `[EvolutionBot] Failed to transcribe audio: ${err}`
+          );
         }
       }
 
@@ -138,9 +153,15 @@ export class EvolutionBotService extends BaseChatbotService<EvolutionBot, Evolut
       const rawLinkPreview = response?.data?.linkPreview;
 
       // Validate linkPreview is boolean and default to true for backward compatibility
-      const linkPreview = typeof rawLinkPreview === 'boolean' ? rawLinkPreview : true;
+      const linkPreview =
+        typeof rawLinkPreview === 'boolean' ? rawLinkPreview : true;
 
-      if (message && typeof message === 'string' && message.startsWith("'") && message.endsWith("'")) {
+      if (
+        message &&
+        typeof message === 'string' &&
+        message.startsWith("'") &&
+        message.endsWith("'")
+      ) {
         const innerContent = message.slice(1, -1);
         if (!innerContent.includes("'")) {
           message = innerContent;
@@ -149,15 +170,25 @@ export class EvolutionBotService extends BaseChatbotService<EvolutionBot, Evolut
 
       if (message) {
         // Use the base class method that handles splitMessages functionality
-        await this.sendMessageWhatsApp(instance, remoteJid, message, settings, linkPreview);
+        await this.sendMessageWhatsApp(
+          instance,
+          remoteJid,
+          message,
+          settings,
+          linkPreview
+        );
       } else {
-        this.logger.warn(`[EvolutionBot] No message content received from bot response`);
+        this.logger.warn(
+          `[EvolutionBot] No message content received from bot response`
+        );
       }
 
       // Send telemetry
       sendTelemetry('/message/sendText');
     } catch (error) {
-      this.logger.error(`Error in sendMessageToBot: ${error.message || JSON.stringify(error)}`);
+      this.logger.error(
+        `Error in sendMessageToBot: ${error.message || JSON.stringify(error)}`
+      );
       return;
     }
   }

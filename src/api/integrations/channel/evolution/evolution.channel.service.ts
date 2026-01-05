@@ -12,7 +12,12 @@ import { chatbotController } from '@api/server.module';
 import { CacheService } from '@api/services/cache.service';
 import { ChannelStartupService } from '@api/services/channel.service';
 import { Events, wa } from '@api/types/wa.types';
-import { AudioConverter, Chatwoot, ConfigService, Openai } from '@config/env.config';
+import {
+  AudioConverter,
+  Chatwoot,
+  ConfigService,
+  Openai,
+} from '@config/env.config';
 import { BadRequestException, InternalServerErrorException } from '@exceptions';
 import { createJid } from '@utils/createJid';
 import { sendTelemetry } from '@utils/sendTelemetry';
@@ -29,7 +34,7 @@ export class EvolutionStartupService extends ChannelStartupService {
     public readonly eventEmitter: EventEmitter2,
     public readonly prismaRepository: PrismaRepository,
     public readonly cache: CacheService,
-    public readonly chatwootCache: CacheService,
+    public readonly chatwootCache: CacheService
   ) {
     super(configService, eventEmitter, prismaRepository, chatwootCache);
 
@@ -74,7 +79,10 @@ export class EvolutionStartupService extends ChannelStartupService {
     this.instance.token = instance.token;
     this.instance.businessId = instance.businessId;
 
-    if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
+    if (
+      this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+      this.localChatwoot?.enabled
+    ) {
       this.chatwootService.eventWhatsapp(
         Events.STATUS_INSTANCE,
         {
@@ -85,7 +93,7 @@ export class EvolutionStartupService extends ChannelStartupService {
         {
           instance: this.instance.name,
           status: 'created',
-        },
+        }
       );
     }
   }
@@ -149,14 +157,15 @@ export class EvolutionStartupService extends ChannelStartupService {
         const isAudio = received?.message?.audioMessage;
 
         if (this.configService.get<Openai>('OPENAI').ENABLED && isAudio) {
-          const openAiDefaultSettings = await this.prismaRepository.openaiSetting.findFirst({
-            where: {
-              instanceId: this.instanceId,
-            },
-            include: {
-              OpenaiCreds: true,
-            },
-          });
+          const openAiDefaultSettings =
+            await this.prismaRepository.openaiSetting.findFirst({
+              where: {
+                instanceId: this.instanceId,
+              },
+              include: {
+                OpenaiCreds: true,
+              },
+            });
 
           if (
             openAiDefaultSettings &&
@@ -170,22 +179,30 @@ export class EvolutionStartupService extends ChannelStartupService {
 
         this.logger.log(messageRaw);
 
-        sendTelemetry(`received.message.${messageRaw.messageType ?? 'unknown'}`);
+        sendTelemetry(
+          `received.message.${messageRaw.messageType ?? 'unknown'}`
+        );
 
         this.sendDataWebhook(Events.MESSAGES_UPSERT, messageRaw);
 
         await chatbotController.emit({
-          instance: { instanceName: this.instance.name, instanceId: this.instanceId },
+          instance: {
+            instanceName: this.instance.name,
+            instanceId: this.instanceId,
+          },
           remoteJid: messageRaw.key.remoteJid,
           msg: messageRaw,
           pushName: messageRaw.pushName,
         });
 
-        if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
+        if (
+          this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+          this.localChatwoot?.enabled
+        ) {
           const chatwootSentMessage = await this.chatwootService.eventWhatsapp(
             Events.MESSAGES_UPSERT,
             { instanceName: this.instance.name, instanceId: this.instanceId },
-            messageRaw,
+            messageRaw
           );
 
           if (chatwootSentMessage?.id) {
@@ -210,7 +227,11 @@ export class EvolutionStartupService extends ChannelStartupService {
     }
   }
 
-  private async updateContact(data: { remoteJid: string; pushName?: string; profilePicUrl?: string }) {
+  private async updateContact(data: {
+    remoteJid: string;
+    pushName?: string;
+    profilePicUrl?: string;
+  }) {
     const contactRaw: any = {
       remoteJid: data.remoteJid,
       pushName: data?.pushName,
@@ -241,7 +262,10 @@ export class EvolutionStartupService extends ChannelStartupService {
 
     this.sendDataWebhook(Events.CONTACTS_UPSERT, contactRaw);
 
-    if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled) {
+    if (
+      this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+      this.localChatwoot?.enabled
+    ) {
       await this.chatwootService.eventWhatsapp(
         Events.CONTACTS_UPDATE,
         {
@@ -249,7 +273,7 @@ export class EvolutionStartupService extends ChannelStartupService {
           instanceId: this.instanceId,
           integration: this.instance.integration,
         },
-        contactRaw,
+        contactRaw
       );
     }
 
@@ -288,7 +312,7 @@ export class EvolutionStartupService extends ChannelStartupService {
     message: any,
     options?: Options,
     file?: any,
-    isIntegration = false,
+    isIntegration = false
   ) {
     try {
       let quoted: any;
@@ -449,17 +473,28 @@ export class EvolutionStartupService extends ChannelStartupService {
 
       this.sendDataWebhook(Events.SEND_MESSAGE, messageRaw);
 
-      if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled && !isIntegration) {
+      if (
+        this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+        this.localChatwoot?.enabled &&
+        !isIntegration
+      ) {
         this.chatwootService.eventWhatsapp(
           Events.SEND_MESSAGE,
           { instanceName: this.instance.name, instanceId: this.instanceId },
-          messageRaw,
+          messageRaw
         );
       }
 
-      if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled && isIntegration)
+      if (
+        this.configService.get<Chatwoot>('CHATWOOT').ENABLED &&
+        this.localChatwoot?.enabled &&
+        isIntegration
+      )
         await chatbotController.emit({
-          instance: { instanceName: this.instance.name, instanceId: this.instanceId },
+          instance: {
+            instanceName: this.instance.name,
+            instanceId: this.instanceId,
+          },
           remoteJid: messageRaw.key.remoteJid,
           msg: messageRaw,
           pushName: messageRaw.pushName,
@@ -491,7 +526,7 @@ export class EvolutionStartupService extends ChannelStartupService {
         mentioned: data?.mentioned,
       },
       null,
-      isIntegration,
+      isIntegration
     );
     return res;
   }
@@ -537,7 +572,11 @@ export class EvolutionStartupService extends ChannelStartupService {
     }
   }
 
-  public async mediaMessage(data: SendMediaDto, file?: any, isIntegration = false) {
+  public async mediaMessage(
+    data: SendMediaDto,
+    file?: any,
+    isIntegration = false
+  ) {
     const mediaData: SendMediaDto = { ...data };
 
     if (file) mediaData.media = file.buffer.toString('base64');
@@ -556,7 +595,7 @@ export class EvolutionStartupService extends ChannelStartupService {
         mentioned: data?.mentioned,
       },
       file,
-      isIntegration,
+      isIntegration
     );
 
     return mediaSent;
@@ -566,7 +605,8 @@ export class EvolutionStartupService extends ChannelStartupService {
     number = number.replace(/\D/g, '');
     const hash = `${number}-${new Date().getTime()}`;
 
-    const audioConverterConfig = this.configService.get<AudioConverter>('AUDIO_CONVERTER');
+    const audioConverterConfig =
+      this.configService.get<AudioConverter>('AUDIO_CONVERTER');
     if (audioConverterConfig.API_URL) {
       try {
         this.logger.verbose('Using audio converter API');
@@ -585,12 +625,16 @@ export class EvolutionStartupService extends ChannelStartupService {
 
         formData.append('format', 'mp4');
 
-        const response = await axios.post(audioConverterConfig.API_URL, formData, {
-          headers: {
-            ...formData.getHeaders(),
-            apikey: audioConverterConfig.API_KEY,
-          },
-        });
+        const response = await axios.post(
+          audioConverterConfig.API_URL,
+          formData,
+          {
+            headers: {
+              ...formData.getHeaders(),
+              apikey: audioConverterConfig.API_KEY,
+            },
+          }
+        );
 
         if (!response?.data?.audio) {
           throw new InternalServerErrorException('Failed to convert audio');
@@ -606,7 +650,9 @@ export class EvolutionStartupService extends ChannelStartupService {
         return prepareMedia;
       } catch (error) {
         this.logger.error(error?.response?.data || error);
-        throw new InternalServerErrorException(error?.response?.data?.message || error?.toString() || error);
+        throw new InternalServerErrorException(
+          error?.response?.data?.message || error?.toString() || error
+        );
       }
     } else {
       let mimetype: string;
@@ -630,7 +676,11 @@ export class EvolutionStartupService extends ChannelStartupService {
     }
   }
 
-  public async audioWhatsapp(data: SendAudioDto, file?: any, isIntegration = false) {
+  public async audioWhatsapp(
+    data: SendAudioDto,
+    file?: any,
+    isIntegration = false
+  ) {
     const mediaData: SendAudioDto = { ...data };
 
     if (file?.buffer) {
@@ -654,7 +704,7 @@ export class EvolutionStartupService extends ChannelStartupService {
         mentioned: data?.mentioned,
       },
       file,
-      isIntegration,
+      isIntegration
     );
 
     return audioSent;
@@ -679,7 +729,7 @@ export class EvolutionStartupService extends ChannelStartupService {
         mentioned: data?.mentioned,
       },
       null,
-      isIntegration,
+      isIntegration
     );
   }
   public async locationMessage() {
@@ -731,7 +781,9 @@ export class EvolutionStartupService extends ChannelStartupService {
     throw new BadRequestException('Method not available on Evolution Channel');
   }
   public async offerCall() {
-    throw new BadRequestException('Method not available on WhatsApp Business API');
+    throw new BadRequestException(
+      'Method not available on WhatsApp Business API'
+    );
   }
   public async sendPresence() {
     throw new BadRequestException('Method not available on Evolution Channel');

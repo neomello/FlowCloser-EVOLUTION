@@ -47,11 +47,17 @@ const logger = new Logger('WA MODULE');
 
 let chatwootCache: CacheService = null;
 if (configService.get<Chatwoot>('CHATWOOT').ENABLED) {
-  chatwootCache = new CacheService(new CacheEngine(configService, ChatwootService.name).getEngine());
+  chatwootCache = new CacheService(
+    new CacheEngine(configService, ChatwootService.name).getEngine()
+  );
 }
 
-export const cache = new CacheService(new CacheEngine(configService, 'instance').getEngine());
-const baileysCache = new CacheService(new CacheEngine(configService, 'baileys').getEngine());
+export const cache = new CacheService(
+  new CacheEngine(configService, 'instance').getEngine()
+);
+const baileysCache = new CacheService(
+  new CacheEngine(configService, 'baileys').getEngine()
+);
 
 let providerFiles: ProviderFiles = null;
 if (configService.get<ProviderSession>('PROVIDER').ENABLED) {
@@ -67,17 +73,29 @@ export const waMonitor = new WAMonitoringService(
   providerFiles,
   cache,
   chatwootCache,
-  baileysCache,
+  baileysCache
 );
 
-const templateService = new TemplateService(waMonitor, prismaRepository, configService);
+const templateService = new TemplateService(
+  waMonitor,
+  prismaRepository,
+  configService
+);
 export const templateController = new TemplateController(templateService);
 
 const proxyService = new ProxyService(waMonitor);
 export const proxyController = new ProxyController(proxyService, waMonitor);
 
-const chatwootService = new ChatwootService(waMonitor, configService, prismaRepository, chatwootCache);
-export const chatwootController = new ChatwootController(chatwootService, configService);
+const chatwootService = new ChatwootService(
+  waMonitor,
+  configService,
+  prismaRepository,
+  chatwootCache
+);
+export const chatwootController = new ChatwootController(
+  chatwootService,
+  configService
+);
 
 const settingsService = new SettingsService(waMonitor);
 export const settingsController = new SettingsController(settingsService);
@@ -93,7 +111,7 @@ export const instanceController = new InstanceController(
   cache,
   chatwootCache,
   baileysCache,
-  providerFiles,
+  providerFiles
 );
 export const sendMessageController = new SendMessageController(waMonitor);
 export const callController = new CallController(waMonitor);
@@ -103,34 +121,105 @@ export const groupController = new GroupController(waMonitor);
 export const labelController = new LabelController(waMonitor);
 
 export const eventManager = new EventManager(prismaRepository, waMonitor);
-export const chatbotController = new ChatbotController(prismaRepository, waMonitor);
-export const channelController = new ChannelController(prismaRepository, waMonitor);
+export const chatbotController = new ChatbotController(
+  prismaRepository,
+  waMonitor
+);
+export const channelController = new ChannelController(
+  prismaRepository,
+  waMonitor
+);
 
 // channels
-export const evolutionController = new EvolutionController(prismaRepository, waMonitor);
+export const evolutionController = new EvolutionController(
+  prismaRepository,
+  waMonitor
+);
 export const metaController = new MetaController(prismaRepository, waMonitor);
 export const baileysController = new BaileysController(waMonitor);
 
-const openaiService = new OpenaiService(waMonitor, prismaRepository, configService);
-export const openaiController = new OpenaiController(openaiService, prismaRepository, waMonitor);
+const openaiService = new OpenaiService(
+  waMonitor,
+  prismaRepository,
+  configService
+);
+export const openaiController = new OpenaiController(
+  openaiService,
+  prismaRepository,
+  waMonitor
+);
 
 // chatbots
-const typebotService = new TypebotService(waMonitor, configService, prismaRepository, openaiService);
-export const typebotController = new TypebotController(typebotService, prismaRepository, waMonitor);
+const typebotService = new TypebotService(
+  waMonitor,
+  configService,
+  prismaRepository,
+  openaiService
+);
+export const typebotController = new TypebotController(
+  typebotService,
+  prismaRepository,
+  waMonitor
+);
 
-const difyService = new DifyService(waMonitor, prismaRepository, configService, openaiService);
-export const difyController = new DifyController(difyService, prismaRepository, waMonitor);
+const difyService = new DifyService(
+  waMonitor,
+  prismaRepository,
+  configService,
+  openaiService
+);
+export const difyController = new DifyController(
+  difyService,
+  prismaRepository,
+  waMonitor
+);
 
-const evolutionBotService = new EvolutionBotService(waMonitor, prismaRepository, configService, openaiService);
-export const evolutionBotController = new EvolutionBotController(evolutionBotService, prismaRepository, waMonitor);
+const evolutionBotService = new EvolutionBotService(
+  waMonitor,
+  prismaRepository,
+  configService,
+  openaiService
+);
+export const evolutionBotController = new EvolutionBotController(
+  evolutionBotService,
+  prismaRepository,
+  waMonitor
+);
 
-const flowiseService = new FlowiseService(waMonitor, prismaRepository, configService, openaiService);
-export const flowiseController = new FlowiseController(flowiseService, prismaRepository, waMonitor);
+const flowiseService = new FlowiseService(
+  waMonitor,
+  prismaRepository,
+  configService,
+  openaiService
+);
+export const flowiseController = new FlowiseController(
+  flowiseService,
+  prismaRepository,
+  waMonitor
+);
 
-const n8nService = new N8nService(waMonitor, prismaRepository, configService, openaiService);
-export const n8nController = new N8nController(n8nService, prismaRepository, waMonitor);
+const n8nService = new N8nService(
+  waMonitor,
+  prismaRepository,
+  configService,
+  openaiService
+);
+export const n8nController = new N8nController(
+  n8nService,
+  prismaRepository,
+  waMonitor
+);
 
-const evoaiService = new EvoaiService(waMonitor, prismaRepository, configService, openaiService);
-export const evoaiController = new EvoaiController(evoaiService, prismaRepository, waMonitor);
+const evoaiService = new EvoaiService(
+  waMonitor,
+  prismaRepository,
+  configService,
+  openaiService
+);
+export const evoaiController = new EvoaiController(
+  evoaiService,
+  prismaRepository,
+  waMonitor
+);
 
 logger.info('Module - ON');
