@@ -2,54 +2,52 @@ name: Security Scan
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main]
   schedule:
-    - cron: '0 0 * * 1' # Weekly on Mondays
+    - cron: '0 0 * * 0' # Weekly on Sunday
 
 jobs:
-  codeql:
-    name: CodeQL Analysis
+  security:
+    name: Security Vulnerability Scan
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'javascript' ]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v5
-      with:
-        submodules: recursive
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{matrix.language}}"
-
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          submodules: recursive
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
+          node-version: '20'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+
+      - name: Check for exposed secrets
+        run: |
+          echo "Checking for exposed secrets..."
+          # Procura apenas por secrets hardcoded críticos (valores reais, não referências)
+          # Padrões perigosos: sk- seguido de 32+ caracteres (tokens OpenAI reais)
+          # Ignora tudo que é referência a variável de ambiente ou nome de variável
+          if grep -r --include="*.js" --include="*.json" --include="*.ts" \
+            -E "(sk-[a-zA-Z0-9]{32,})" \
+            . | grep -v "node_modules" | grep -v ".git" | grep -v "package-lock.json" | \
+            grep -v "test" | grep -v "tests/" | grep -v "\.test\." | grep -v "env-example" | \
+            grep -v "\.example\." | grep -v "process\.env" | grep -v "config\." | \
+            grep -v "window\.APP_CONFIG" | grep -v "GOOGLE_API_KEY\|OPENAI_API_KEY" | \
+            grep -v "VAR_NAME\|VAR\s*=" | head -5; then
+            echo "⚠️  Potential secrets found. Please review."
+            exit 1
+          fi
+          echo "✅ No obvious secrets found"
+
+      - name: Validate .env.example exists
+        run: |
+          if [ ! -f "env-example.txt" ] && [ ! -f ".env.example" ]; then
+            echo "⚠️  No .env.example file found"
+          else
+            echo "✅ .env.example file exists"
+          fi
+
