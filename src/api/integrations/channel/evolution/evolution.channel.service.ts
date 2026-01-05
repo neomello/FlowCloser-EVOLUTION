@@ -314,8 +314,6 @@ export class EvolutionStartupService extends ChannelStartupService {
         webhookUrl = options.webhookUrl;
       }
 
-      let audioFile;
-
       const messageId = v4();
 
       let messageRaw: any;
@@ -361,13 +359,6 @@ export class EvolutionStartupService extends ChannelStartupService {
           webhookUrl,
           source: 'unknown',
           instanceId: this.instanceId,
-        };
-
-        const buffer = Buffer.from(message.media, 'base64');
-        audioFile = {
-          buffer,
-          mimetype: 'audio/mp4',
-          originalname: `${messageId}.mp4`,
         };
       } else if (message?.mediaType === 'document') {
         messageRaw = {
@@ -450,7 +441,6 @@ export class EvolutionStartupService extends ChannelStartupService {
         }
       }
 
-      const { base64 } = messageRaw.message;
       delete messageRaw.message.base64;
 
       // S3 storage integration removed

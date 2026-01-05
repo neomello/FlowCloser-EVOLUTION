@@ -5,7 +5,7 @@
 [![Docker Image](https://img.shields.io/badge/Docker-image-blue)](https://hub.docker.com/r/evoapicloud/evolution-api)
 [![Whatsapp Group](https://img.shields.io/badge/Group-WhatsApp-%2322BC18)](https://evolution-api.com/whatsapp)
 [![Discord Community](https://img.shields.io/badge/Discord-Community-blue)](https://evolution-api.com/discord)
-[![Postman Collection](https://img.shields.io/badge/Postman-Collection-orange)](https://evolution-api.com/postman) 
+[![Postman Collection](https://img.shields.io/badge/Postman-Collection-orange)](https://evolution-api.com/postman)
 [![Documentation](https://img.shields.io/badge/Documentation-Official-green)](https://doc.evolution-api.com)
 [![Feature Requests](https://img.shields.io/badge/Feature-Requests-purple)](https://evolutionapi.canny.io/feature-requests)
 [![Roadmap](https://img.shields.io/badge/Roadmap-Community-blue)](https://evolutionapi.canny.io/feature-requests)
@@ -24,23 +24,40 @@ Evolution API began as a WhatsApp controller API based on [CodeChat](https://git
 
 Today, Evolution API is not limited to WhatsApp. It integrates with various platforms such as Typebot, Chatwoot, Dify, and OpenAI, offering a broad array of functionalities beyond messaging. Evolution API supports both the Baileys-based WhatsApp API and the official WhatsApp Business API, with upcoming support for Instagram and Messenger.
 
+## Web3 Architecture
+
+FlowCloser-EVOLUTION is built on a decentralized, censorship-resistant architecture aligned with web3 principles:
+
+- **Kwil DB** → Decentralized SQL database via consensus
+- **Ceramic** → Immutable logs with DID (Decentralized Identifiers)
+- **The Graph** → Distributed indexing and querying
+- **Gun.js** → Real-time P2P synchronization without servers
+- **IPFS** → Permanent, distributed storage
+- **Multi-layer redundancy** → High availability and fault tolerance
+- **Censorship resistant** → No single point of failure or control
+- **100% web3 aligned** → Fully decentralized infrastructure
+
 ## Looking for a Lightweight Version?
+
 For those who need a more streamlined and performance-optimized version, check out [Evolution API Lite](https://github.com/EvolutionAPI/evolution-api-lite). It's designed specifically for microservices, focusing solely on connectivity without integrations or audio conversion features. Ideal for environments that prioritize simplicity and efficiency.
 
 ## Types of Connections
 
 Evolution API supports multiple types of connections to WhatsApp, enabling flexible and powerful integration options:
 
-- *WhatsApp API - Baileys*:
+- *WhatsApp API - Baileys* (Recommended for free usage):
   - A free API based on WhatsApp Web, leveraging the [Baileys library](https://github.com/WhiskeySockets/Baileys).
+  - This is the **default and recommended provider** for most use cases, especially when you want a free solution.
   - This connection type allows control over WhatsApp Web functionalities through a RESTful API, suitable for multi-service chats, service bots, and other WhatsApp-integrated systems.
+  - **Configuration**: Use `integration: "WHATSAPP-BAILEYS"` when creating instances (this is the default if not specified).
   - Note: This method relies on the web version of WhatsApp and may have limitations compared to official APIs.
 
-- *WhatsApp Cloud API*:
+- *WhatsApp Cloud API* (Business):
   - The official API provided by Meta (formerly Facebook).
   - This connection type offers a robust and reliable solution designed for businesses needing higher volumes of messaging and better integration support.
   - The Cloud API supports features such as end-to-end encryption, advanced analytics, and more comprehensive customer service tools.
   - To use this API, you must comply with Meta's policies and potentially pay for usage based on message volume and other factors.
+  - **Configuration**: Use `integration: "WHATSAPP-BUSINESS"` when creating instances (requires a token).
 
 ## Integrations
 
@@ -63,18 +80,21 @@ Evolution API supports various integrations to enhance its functionality. Below 
 We value community input and feedback to continuously improve Evolution API:
 
 ### 🚀 Feature Requests & Roadmap
+
 - **[Feature Requests](https://evolutionapi.canny.io/feature-requests)**: Submit new feature ideas and vote on community proposals
 - **[Roadmap](https://evolutionapi.canny.io/feature-requests)**: View planned features and development progress
 - **[Changelog](https://evolutionapi.canny.io/changelog)**: Stay updated with the latest releases and improvements
 
 ### 💬 Community Support
+
 - **[WhatsApp Group](https://evolution-api.com/whatsapp)**: Join our community for support and discussions
 - **[Discord Community](https://evolution-api.com/discord)**: Real-time chat with developers and users
 - **[GitHub Issues](https://github.com/EvolutionAPI/evolution-api/issues)**: Report bugs and technical issues
 
 ### 🔒 Security
+
 - **[Security Policy](./SECURITY.md)**: Guidelines for reporting security vulnerabilities
-- **Security Contact**: contato@evolution-api.com
+- **Security Contact**: <contato@evolution-api.com>
 
 ## Telemetry Notice
 
@@ -86,11 +106,11 @@ Join our Evolution Pro community for expert support and a weekly call to answer 
 
 [Click here to learn more](https://evolution-api.com/suporte-pro)
 
-# Donate to the project.
+# Donate to the project
 
 #### Github Sponsors
 
-https://github.com/sponsors/EvolutionAPI
+<https://github.com/sponsors/EvolutionAPI>
 
 # Content Creator Partners
 
@@ -122,7 +142,7 @@ Evolution API is licensed under the Apache License 2.0, with the following addit
 
 2. **Usage Notification Requirement**: If Evolution API is used as part of any project, including closed-source systems (e.g., proprietary software), the user is required to display a clear notification within the system that Evolution API is being utilized. This notification should be visible to system administrators and accessible from the system's documentation or settings page. Failure to comply with this requirement may result in the necessity for a commercial license, as determined by the producer.
 
-Please contact contato@evolution-api.com to inquire about licensing matters.
+Please contact <contato@evolution-api.com> to inquire about licensing matters.
 
 Apart from the specific conditions mentioned above, all other rights and restrictions follow the Apache License 2.0. Detailed information about the Apache License 2.0 can be found at [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
 

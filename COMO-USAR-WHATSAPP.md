@@ -5,9 +5,8 @@ Este guia explica como configurar e usar o Evolution API para conectar e gerenci
 ## Pré-requisitos
 
 - Node.js 20+ instalado
-- PostgreSQL ou MySQL configurado
-- Redis (opcional, mas recomendado)
 - Conta WhatsApp para conectar
+- Acesso à rede web3 (Kwil DB, Ceramic, The Graph, IPFS)
 
 ## Instalação
 
@@ -27,9 +26,12 @@ SERVER_NAME=evolution
 SERVER_TYPE=http
 SERVER_PORT=8080
 
-# Banco de Dados (escolha PostgreSQL ou MySQL)
-DATABASE_PROVIDER=postgresql  # ou mysql
-DATABASE_CONNECTION_URI=postgresql://usuario:senha@localhost:5432/evolution_api
+# Arquitetura Web3 (Kwil DB, Ceramic, The Graph, Gun.js, IPFS)
+# Configurações de rede descentralizada
+KWIL_DB_NODE_URL=
+CERAMIC_NODE_URL=
+THE_GRAPH_URL=
+IPFS_NODE_URL=
 
 # Autenticação
 AUTHENTICATION_API_KEY=sua-chave-secreta-aqui
@@ -39,29 +41,17 @@ CACHE_REDIS_ENABLED=true
 CACHE_REDIS_URI=redis://localhost:6379
 ```
 
-### 2. Configurar o Banco de Dados
+### 2. Arquitetura Web3
 
-Primeiro, defina o provider do banco:
+FlowCloser-EVOLUTION utiliza uma arquitetura descentralizada baseada em web3:
 
-```bash
-export DATABASE_PROVIDER=postgresql  # ou mysql
-```
+- **Kwil DB**: Banco de dados SQL descentralizado via consensus
+- **Ceramic**: Logs imutáveis com DID (Decentralized Identifiers)
+- **The Graph**: Indexação e consultas distribuídas
+- **Gun.js**: Sincronização P2P em tempo real sem servidor
+- **IPFS**: Armazenamento permanente e distribuído
 
-Gere o cliente Prisma:
-
-```bash
-npm run db:generate
-```
-
-Execute as migrações:
-
-```bash
-# Desenvolvimento
-npm run db:migrate:dev
-
-# Produção
-npm run db:deploy
-```
+> 💡 **Nota**: Esta arquitetura garante censura resistente, redundância em múltiplas camadas e 100% alinhamento com web3.
 
 ### 3. Instalar Dependências e Iniciar
 
@@ -76,6 +66,28 @@ npm start
 ### Criando uma Instância WhatsApp
 
 Uma instância representa uma conexão WhatsApp. Você pode criar múltiplas instâncias para diferentes números.
+
+#### Escolhendo o Tipo de Provedor
+
+O Evolution API suporta diferentes tipos de integração:
+
+- **`WHATSAPP-BAILEYS`** (Padrão recomendado - Gratuito):
+  - API gratuita baseada no WhatsApp Web
+  - Recomendado para a maioria dos casos de uso
+  - Não requer configuração adicional (token, etc.)
+  - Ideal para uso pessoal, pequenas empresas e desenvolvimento
+
+- **`WHATSAPP-BUSINESS`** (API oficial do Meta):
+  - API oficial do WhatsApp Business
+  - Requer token e configuração do Meta
+  - Mais robusta para alto volume de mensagens
+  - Ideal para empresas com necessidades específicas
+
+- **`WHATSAPP-EVOLUTION`** (Integração customizada):
+  - Integração personalizada do Evolution API
+  - Para casos de uso específicos
+
+> 💡 **Recomendação**: Para uso gratuito, use `WHATSAPP-BAILEYS`. É o padrão recomendado e não requer configuração adicional.
 
 #### Endpoint: Criar Instância
 
@@ -97,7 +109,12 @@ apikey: sua-chave-secreta-aqui
 - `instanceName`: Nome único para identificar a instância
 - `token`: Token opcional para autenticação do QR code
 - `qrcode`: Se `true`, retorna QR code para escanear
-- `integration`: Tipo de integração (`WHATSAPP-BAILEYS`, `WHATSAPP-BUSINESS`, `WHATSAPP-EVOLUTION`)
+- `integration`: Tipo de integração
+  - `WHATSAPP-BAILEYS` (padrão recomendado - gratuito)
+  - `WHATSAPP-BUSINESS` (requer token do Meta)
+  - `WHATSAPP-EVOLUTION` (integração customizada)
+  
+> 📝 **Nota**: Se você não especificar `integration`, o sistema usará `WHATSAPP-BAILEYS` como padrão.
 
 **Resposta de Sucesso:**
 
@@ -118,9 +135,11 @@ apikey: sua-chave-secreta-aqui
 
 ### Conectando ao WhatsApp
 
-#### Método 1: QR Code (Baileys)
+#### Método 1: QR Code com Baileys (Recomendado - Gratuito)
 
-1. **Criar a instância com QR code:**
+O Baileys é o provedor padrão recomendado para uso gratuito. Conecte facilmente usando QR Code:
+
+1. **Criar a instância com QR code (Baileys é o padrão):**
 
 ```bash
 curl -X POST http://localhost:8080/instance/create \
@@ -132,6 +151,8 @@ curl -X POST http://localhost:8080/instance/create \
     "integration": "WHATSAPP-BAILEYS"
   }'
 ```
+
+> 💡 **Dica**: Se você não especificar `integration`, o sistema automaticamente usará `WHATSAPP-BAILEYS`.
 
 1. **Escaneie o QR code:**
    - A resposta contém o QR code em base64

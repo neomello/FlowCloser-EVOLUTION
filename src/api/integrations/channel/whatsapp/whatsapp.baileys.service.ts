@@ -142,7 +142,6 @@ import mimeTypes from 'mime-types';
 import NodeCache from 'node-cache';
 import cron from 'node-cron';
 import { release } from 'os';
-import { join } from 'path';
 import P from 'pino';
 import qrcode, { QRCodeToDataURLOptions } from 'qrcode';
 import qrcodeTerminal from 'qrcode-terminal';
@@ -1311,8 +1310,6 @@ export class BaileysStartupService extends ChannelStartupService {
             received?.message?.ptvMessage ||
             received?.message?.audioMessage;
 
-          const isVideo = received?.message?.videoMessage;
-
           if (this.localSettings.readMessages && received.key.id !== 'status@broadcast') {
             await this.client.readMessages([received.key]);
           }
@@ -2380,8 +2377,6 @@ export class BaileysStartupService extends ChannelStartupService {
         messageSent?.message?.ptvMessage ||
         messageSent?.message?.audioMessage;
 
-      const isVideo = messageSent?.message?.videoMessage;
-
       if (this.configService.get<Chatwoot>('CHATWOOT').ENABLED && this.localChatwoot?.enabled && !isIntegration) {
         this.chatwootService.eventWhatsapp(
           Events.SEND_MESSAGE,
@@ -2402,7 +2397,7 @@ export class BaileysStartupService extends ChannelStartupService {
       }
 
       if (this.configService.get<Database>('DATABASE').SAVE_DATA.NEW_MESSAGE) {
-        const msg = await this.prismaRepository.message.create({ data: messageRaw });
+        await this.prismaRepository.message.create({ data: messageRaw });
 
         // S3 storage integration removed
       }

@@ -39,7 +39,8 @@ export class EventManager {
     return this.webhookController;
   }
 
-  public init(httpServer: Server): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public init(_httpServer: Server): void {
     // Webhook doesn't need initialization
   }
 

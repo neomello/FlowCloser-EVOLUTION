@@ -9,6 +9,7 @@ This document provides comprehensive guidelines for AI agents (Claude, GPT, Curs
 ## Project Structure & Module Organization
 
 ### Core Directories
+
 - **`src/`** – TypeScript source code with modular architecture
   - `api/controllers/` – HTTP route handlers (thin layer)
   - `api/services/` – Business logic (core functionality)
@@ -21,10 +22,7 @@ This document provides comprehensive guidelines for AI agents (Claude, GPT, Curs
   - `dto/` – Data Transfer Objects (simple classes, no decorators)
   - `guards/` – Authentication/authorization middleware
   - `types/` – TypeScript type definitions
-  - `repository/` – Data access layer (Prisma)
-- **`prisma/`** – Database schemas and migrations
-  - `postgresql-schema.prisma` / `mysql-schema.prisma` – Provider-specific schemas
-  - `postgresql-migrations/` / `mysql-migrations/` – Provider-specific migrations
+  - `repository/` – Data access layer (Web3: Kwil DB, Ceramic, The Graph)
 - **`config/`** – Environment and application configuration
 - **`utils/`** – Shared utilities and helper functions
 - **`validate/`** – JSONSchema7 validation schemas
@@ -32,6 +30,7 @@ This document provides comprehensive guidelines for AI agents (Claude, GPT, Curs
 - **`cache/`** – Redis and local cache implementations
 
 ### Build & Deployment
+
 - **`dist/`** – Build output (do not edit directly)
 - **`public/`** – Static assets and media files
 - **`Docker*`**, **`docker-compose*.yaml`** – Containerization and local development stack
@@ -39,6 +38,7 @@ This document provides comprehensive guidelines for AI agents (Claude, GPT, Curs
 ## Build, Test, and Development Commands
 
 ### Development Workflow
+
 ```bash
 # Development server with hot reload
 npm run dev:server
@@ -52,6 +52,7 @@ npm run start:prod
 ```
 
 ### Code Quality
+
 ```bash
 # Linting and formatting
 npm run lint        # ESLint with auto-fix
@@ -61,38 +62,33 @@ npm run lint:check  # ESLint check only
 npm run commit      # Interactive commit with Commitizen
 ```
 
-### Database Management
+### Web3 Architecture
+
+FlowCloser-EVOLUTION uses a decentralized, web3-aligned architecture:
+
+- **Kwil DB** → Decentralized SQL database via consensus
+- **Ceramic** → Immutable logs with DID (Decentralized Identifiers)
+- **The Graph** → Distributed indexing and querying
+- **Gun.js** → Real-time P2P synchronization without servers
+- **IPFS** → Permanent, distributed storage
+- **Multi-layer redundancy** → High availability and fault tolerance
+- **Censorship resistant** → No single point of failure or control
+- **100% web3 aligned** → Fully decentralized infrastructure
+
+### Web3 Development Setup
+
 ```bash
-# Set database provider first (CRITICAL)
-export DATABASE_PROVIDER=postgresql  # or mysql
+# Configure web3 nodes
+# Kwil DB, Ceramic, The Graph, IPFS, Gun.js
 
-# Generate Prisma client
-npm run db:generate
-
-# Development migrations (with provider sync)
-npm run db:migrate:dev      # Unix/Mac
-npm run db:migrate:dev:win  # Windows
-
-# Production deployment
-npm run db:deploy      # Unix/Mac
-npm run db:deploy:win  # Windows
-
-# Database tools
-npm run db:studio      # Open Prisma Studio
-```
-
-### Docker Development
-```bash
-# Start local services (Redis, PostgreSQL, etc.)
-docker-compose up -d
-
-# Full development stack
-docker-compose -f docker-compose.dev.yaml up -d
+# Start development server
+npm run dev:server
 ```
 
 ## Coding Standards & Architecture Patterns
 
 ### Code Style (Enforced by ESLint + Prettier)
+
 - **TypeScript strict mode** with full type coverage
 - **2-space indentation**, single quotes, trailing commas
 - **120-character line limit**
@@ -107,6 +103,7 @@ docker-compose -f docker-compose.dev.yaml up -d
 ### Architecture Patterns
 
 #### Service Layer Pattern
+
 ```typescript
 export class ExampleService {
   constructor(private readonly waMonitor: WAMonitoringService) {}
@@ -131,6 +128,7 @@ export class ExampleService {
 ```
 
 #### Controller Pattern (Thin Layer)
+
 ```typescript
 export class ExampleController {
   constructor(private readonly exampleService: ExampleService) {}
@@ -142,6 +140,7 @@ export class ExampleController {
 ```
 
 #### RouterBroker Pattern
+
 ```typescript
 export class ExampleRouter extends RouterBroker {
   constructor(...guards: any[]) {
@@ -160,6 +159,7 @@ export class ExampleRouter extends RouterBroker {
 ```
 
 #### DTO Pattern (Simple Classes)
+
 ```typescript
 // CORRECT - Evolution API pattern (no decorators)
 export class ExampleDto {
@@ -176,6 +176,7 @@ export class BadExampleDto {
 ```
 
 #### Validation Pattern (JSONSchema7)
+
 ```typescript
 import { JSONSchema7 } from 'json-schema';
 import { v4 } from 'uuid';
@@ -195,12 +196,14 @@ export const exampleSchema: JSONSchema7 = {
 ## Multi-Tenant Architecture
 
 ### Instance Isolation
+
 - **CRITICAL**: All operations must be scoped by `instanceName` or `instanceId`
 - **Database queries**: Always include `where: { instanceId: ... }`
 - **Authentication**: Validate instance ownership before operations
 - **Data isolation**: Complete separation between tenant instances
 
 ### WhatsApp Instance Management
+
 ```typescript
 // Access instance via WAMonitoringService
 const waInstance = this.waMonitor.waInstances[instance.instanceName];
@@ -209,37 +212,44 @@ if (!waInstance) {
 }
 ```
 
-## Database Patterns
+## Web3 Architecture Patterns
 
-### Multi-Provider Support
-- **PostgreSQL**: Uses `@db.Integer`, `@db.JsonB`, `@default(now())`
-- **MySQL**: Uses `@db.Int`, `@db.Json`, `@default(now())`
-- **Environment**: Set `DATABASE_PROVIDER=postgresql` or `mysql`
-- **Migrations**: Provider-specific folders auto-selected
+FlowCloser-EVOLUTION uses a decentralized, web3-aligned architecture:
 
-### Prisma Repository Pattern
+### Decentralized Data Storage
+
+- **Kwil DB**: Decentralized SQL database via consensus
+- **Ceramic**: Immutable logs with DID (Decentralized Identifiers)
+- **The Graph**: Distributed indexing and querying
+- **Gun.js**: Real-time P2P synchronization without servers
+- **IPFS**: Permanent, distributed storage
+
+### Web3 Repository Pattern
+
 ```typescript
-// Always use PrismaRepository for database operations
-const result = await this.prismaRepository.instance.findUnique({
-  where: { name: instanceName },
-});
+// Use web3 data layer for database operations
+// Kwil DB for SQL queries, Ceramic for immutable logs
+// The Graph for indexing, IPFS for storage
 ```
 
 ## Integration Patterns
 
 ### Channel Integration (WhatsApp Providers)
+
 - **Baileys**: WhatsApp Web with QR code authentication
 - **Business API**: Official Meta WhatsApp Business API  
 - **Evolution API**: Custom WhatsApp integration
 - **Pattern**: Extend base channel service classes
 
 ### Chatbot Integration
+
 - **Base classes**: Extend `BaseChatbotService` and `BaseChatbotController`
 - **Trigger system**: Support keyword, regex, and advanced triggers
 - **Session management**: Handle conversation state per user
 - **Available integrations**: EvolutionBot, OpenAI, Dify, Typebot, Chatwoot, Flowise, N8N, EvoAI
 
 ### Event Integration
+
 - **Internal events**: EventEmitter2 for application events
 - **External events**: WebSocket, RabbitMQ, SQS, NATS, Pusher
 - **Webhook delivery**: Reliable delivery with retry logic
@@ -247,11 +257,13 @@ const result = await this.prismaRepository.instance.findUnique({
 ## Testing Guidelines
 
 ### Current State
+
 - **No formal test suite** currently implemented
 - **Manual testing** is the primary approach
 - **Integration testing** in development environment
 
 ### Testing Strategy
+
 ```typescript
 // Place tests in test/ directory as *.test.ts
 // Run: npm test (watches test/all.test.ts)
@@ -266,6 +278,7 @@ describe('ExampleService', () => {
 ```
 
 ### Recommended Approach
+
 - Focus on **critical business logic** in services
 - **Mock external dependencies** (WhatsApp APIs, databases)
 - **Integration tests** for API endpoints
@@ -274,6 +287,7 @@ describe('ExampleService', () => {
 ## Commit & Pull Request Guidelines
 
 ### Conventional Commits (Enforced by commitlint)
+
 ```bash
 # Use interactive commit tool
 npm run commit
@@ -283,12 +297,14 @@ npm run commit
 ```
 
 ### Examples
+
 - `feat(api): add WhatsApp message status endpoint`
 - `fix(baileys): resolve connection timeout issue`
 - `docs(readme): update installation instructions`
 - `refactor(service): extract common message validation logic`
 
 ### Pull Request Requirements
+
 - **Clear description** of changes and motivation
 - **Linked issues** if applicable
 - **Migration impact** (specify database provider)
@@ -298,16 +314,21 @@ npm run commit
 ## Security & Configuration
 
 ### Environment Setup
+
 ```bash
 # Copy example environment file
 cp .env.example .env
 
 # NEVER commit secrets to version control
-# Set DATABASE_PROVIDER before database commands
-export DATABASE_PROVIDER=postgresql  # or mysql
+# Configure web3 nodes (Kwil DB, Ceramic, The Graph, IPFS)
+KWIL_DB_NODE_URL=
+CERAMIC_NODE_URL=
+THE_GRAPH_URL=
+IPFS_NODE_URL=
 ```
 
 ### Security Best Practices
+
 - **API key authentication** via `apikey` header
 - **Input validation** with JSONSchema7
 - **Rate limiting** on all endpoints
@@ -316,18 +337,21 @@ export DATABASE_PROVIDER=postgresql  # or mysql
 - **Secure defaults** for all configurations
 
 ### Vulnerability Reporting
+
 - See `SECURITY.md` for security vulnerability reporting process
 - Contact: `contato@evolution-api.com`
 
 ## Communication Standards
 
 ### Language Requirements
+
 - **User communication**: Always respond in Portuguese (PT-BR)
 - **Code/comments**: English for technical documentation
 - **API responses**: English for consistency
 - **Error messages**: Portuguese for user-facing errors
 
 ### Documentation Standards
+
 - **Inline comments**: Document complex business logic
 - **API documentation**: Document all public endpoints
 - **Integration guides**: Document new integration patterns
@@ -336,20 +360,23 @@ export DATABASE_PROVIDER=postgresql  # or mysql
 ## Performance & Scalability
 
 ### Caching Strategy
+
 - **Redis primary**: Distributed caching for production
 - **Node-cache fallback**: Local caching when Redis unavailable
 - **TTL strategy**: Appropriate cache expiration per data type
 - **Cache invalidation**: Proper invalidation on data changes
 
 ### Connection Management
-- **Database**: Prisma connection pooling
+
+- **Web3 Data Layer**: Kwil DB consensus, Ceramic streams, The Graph indexing
 - **WhatsApp**: One connection per instance with lifecycle management
-- **Redis**: Connection pooling and retry logic
+- **P2P Sync**: Gun.js for real-time synchronization without servers
+- **Storage**: IPFS for permanent, distributed file storage
 - **External APIs**: Rate limiting and retry with exponential backoff
 
 ### Monitoring & Observability
+
 - **Structured logging**: Pino logger with correlation IDs
 - **Error tracking**: Comprehensive error scenarios
 - **Health checks**: Instance status and connection monitoring
 - **Telemetry**: Usage analytics (non-sensitive data only)
-
